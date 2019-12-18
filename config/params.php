@@ -8,6 +8,8 @@
  * @copyright Copyright (c) 2014-2019, HiQDev (http://hiqdev.com/)
  */
 
+use vintage\recaptcha\helpers\RecaptchaConfig;
+
 return [
     'hiam.authorizedClients' => array_filter([
         'demo' => $_ENV['ENV'] !== 'PROD' ? 'pass' : null,
@@ -48,4 +50,7 @@ return [
 
     'swiftmailer.smtp.host'     => null,
     'swiftmailer.smtp.port'     => 25,
+
+    RecaptchaConfig::SITE_KEY       => null,
+    RecaptchaConfig::PRIVATE_KEY    => null,
 ];
