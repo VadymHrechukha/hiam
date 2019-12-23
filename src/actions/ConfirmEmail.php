@@ -17,6 +17,12 @@ use yii\base\Action;
 use yii\web\Session;
 use yii\web\User;
 
+/**
+ * Class ConfirmEmail
+ * @package hiam\actions
+ *
+ * @property-read \hiam\controllers\SiteController $controller
+ */
 class ConfirmEmail extends Action
 {
     /**
@@ -91,8 +97,7 @@ class ConfirmEmail extends Action
                 $token->remove();
             }
         }
-
-        return $this->controller->goBack();
+        return $this->controller->actionTransition();
     }
 
     private function getSuccessMessage(): string
