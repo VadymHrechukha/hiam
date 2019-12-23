@@ -33,6 +33,7 @@ use Yii;
 use yii\authclient\AuthAction;
 use yii\authclient\ClientInterface;
 use yii\filters\AccessControl;
+use yii\web\Response;
 
 /**
  * Site controller.
@@ -285,7 +286,7 @@ class SiteController extends \hisite\controllers\SiteController
                 $this->sendConfirmEmail($user, 'confirm-sign-up-email');
                 Yii::$app->session->setFlash('success', Yii::t('hiam', 'Your account has been successfully created.'));
 
-                return $this->goBack();
+                return $this->redirect('transition');
             }
         } else {
             if ($client) {
@@ -443,7 +444,7 @@ class SiteController extends \hisite\controllers\SiteController
                     $this->sendConfirmEmail($identity, 'confirm-email', $model->email);
                 }
 
-                return $this->goBack();
+                return $this->redirect('transition');
             }
         }
 
@@ -464,27 +465,22 @@ class SiteController extends \hisite\controllers\SiteController
     public function goBack($defaultUrl = null)
     {
         $response = $this->oauth->goBack() ?? parent::goBack($defaultUrl);
-        if (empty($response)) {
-            return $response;
-        }
-        if (Yii::$app->session->hasFlash('success')) {
-            $separ = strpos($response->headers['location'], '?') ? '&' : '?';
-            $response->headers['location'] .= $separ . 'success=true';
-        }
-        $requestHost = $this->getHost(Yii::$app->request->hostInfo);
-        $responseHost = $this->getHost($response->headers['location']);
-        if (strcmp($requestHost, $responseHost)) {
-            Yii::$app->session->removeAllFlashes();
-        }
-
+        $this->addSuccessParamToResponseUrl($response);
         return $response;
     }
 
-    private function getHost(string $url): ?string
+    /**
+     * @param Response|string|null $response
+     */
+    private function addSuccessParamToResponseUrl($response)
     {
-        $parsedArray = parse_url($url);
-
-        return $parsedArray['host'] ?? null;
+        if (empty($response)) {
+            return;
+        }
+        if (Yii::$app->session->hasFlash('success')) {
+            $separator = strpos($response->headers['location'], '?') ? '&' : '?';
+            $response->headers['location'] .= $separator . 'success=true';
+        }
     }
 
     protected function sendConfirmEmail($user, $action, $newEmail = null)
