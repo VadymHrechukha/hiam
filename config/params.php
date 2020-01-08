@@ -50,6 +50,9 @@ return [
 
     'swiftmailer.smtp.host'     => null,
     'swiftmailer.smtp.port'     => 25,
+    'swiftmailer.smtp.authmode' => null,
+    'swiftmailer.smtp.username' => null,
+    'swiftmailer.smtp.password' => null,
 
     RecaptchaConfig::SITE_KEY       => null,
     RecaptchaConfig::PRIVATE_KEY    => null,
