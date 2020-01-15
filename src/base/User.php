@@ -16,6 +16,7 @@ use hiam\models\Identity;
 use Yii;
 use yii\authclient\ClientInterface;
 use yii\web\IdentityInterface;
+use yii\web\Session;
 
 class User extends \yii\web\User
 {
@@ -29,9 +30,27 @@ class User extends \yii\web\User
 
     public $loginDuration = 3600 * 24 * 31;
 
+    private $session;
+
+    public function __construct(Session $session, $config = [])
+    {
+        parent::__construct($config);
+
+        $this->session = $session;
+    }
+
     public function login(IdentityInterface $identity, $duration = null)
     {
         return parent::login($identity, $duration ?? $this->loginDuration);
+    }
+
+    public function logout($destroySession = true)
+    {
+        $backUrl = $this->session->get($this->returnUrlParam);
+        $res = parent::logout($destroySession);
+        $this->session->set($this->returnUrlParam, $backUrl);
+
+        return $res;
     }
 
     /**

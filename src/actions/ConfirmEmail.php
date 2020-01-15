@@ -76,7 +76,7 @@ class ConfirmEmail extends Action
     /** {@inheritdoc} */
     protected function beforeRun()
     {
-        Yii::$app->user->logout();
+        $this->user->logout();
 
         return parent::beforeRun();
     }
