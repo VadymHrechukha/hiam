@@ -56,4 +56,6 @@ return [
 
     RecaptchaConfig::SITE_KEY       => null,
     RecaptchaConfig::PRIVATE_KEY    => null,
+
+    'totpRedirectBackAction.url' => '/site/back',
 ];
