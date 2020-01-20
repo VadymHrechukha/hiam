@@ -1,3 +1,4 @@
+```plantuml
 @startuml
 
 !define Entity(name,desc) class name as "desc" << (T,#EEEEEE) >> #FFDDDD
@@ -62,3 +63,4 @@ client2role -up-> client
 contact -right-> client
 
 @enduml
+```
