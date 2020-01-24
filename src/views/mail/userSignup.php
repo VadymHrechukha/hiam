@@ -19,8 +19,27 @@ $message->renderTextBody(basename(__FILE__, '.php') . '-text', compact('user'));
     <p>
         <?= Yii::t('hiam', 'Login') ?>: <b><?= $user->username ?></b><br>
         <?= Yii::t('hiam', 'Email') ?>: <?= $user->email ?><br>
-        <?= Yii::t('hiam', 'First name') ?>: <?= $user->first_name ?><br>
-        <?= Yii::t('hiam', 'Last name') ?>: <?= $user->last_name ?><br>
+
+        <?php if (!empty($user->first_name)): ?>
+            <?= Yii::t('hiam', 'First name') ?>: <?= $user->first_name ?><br>
+        <?php endif ?>
+        <?php if (!empty($user->last_name)): ?>
+            <?= Yii::t('hiam', 'Last name') ?>: <?= $user->last_name ?><br>
+        <?php endif ?>
+        <br>
+
+        <?php if (!empty($user->referralParams['referer'])): ?>
+            <?= Yii::t('hiam', 'Referer') ?>: <?= $user->referralParams['referer'] ?><br>
+            <br/>
+        <?php endif ?>
+
+        <?php if (!empty($user->referralParams['utmTags'])): ?>
+            <?php foreach ($user->referralParams['utmTags'] as $key => $value) : ?>
+                <?= $key ?>: <?= $value ?><br>
+            <?php endforeach ?>
+            <br/>
+        <?php endif ?>
+
         <?= Yii::t('hiam', 'IP') ?>:  <?= Yii::$app->request->getRemoteIP() ?><br>
     </p>
 </div>

@@ -14,9 +14,13 @@
 
 <?= Yii::t('hiam', 'Email: {email}', ['email' => $user->email]) ?>
 
-<?= Yii::t('hiam', 'First name: {first_name}', ['first_name' => $user->first_name]) ?>
+<?php if (!empty($user->first_name)): ?>
+    <?= Yii::t('hiam', 'First name: {first_name}', ['first_name' => $user->first_name]) ?>
 
-<?= Yii::t('hiam', 'Last name: {last_name}', ['last_name' => $user->last_name]) ?>
+<?php endif ?>
+<?php if (!empty($user->last_name)): ?>
+    <?= Yii::t('hiam', 'Last name: {last_name}', ['last_name' => $user->last_name]) ?>
+<?php endif ?>
 
 <?= Yii::t('hiam', 'IP: {ip}', ['ip' => Yii::$app->request->getRemoteIP()]) ?>
 
