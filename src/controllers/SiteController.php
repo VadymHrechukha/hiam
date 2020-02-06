@@ -284,7 +284,6 @@ class SiteController extends \hisite\controllers\SiteController
                     $this->user->setRemoteUser($client, $user);
                 }
                 $this->sendConfirmEmail($user, 'confirm-sign-up-email');
-                Yii::$app->session->setFlash('success', Yii::t('hiam', 'Your account has been successfully created.'));
 
                 return $this->redirect('transition');
             }
