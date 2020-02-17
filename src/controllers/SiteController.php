@@ -212,7 +212,7 @@ class SiteController extends \hisite\controllers\SiteController
         $returnUrl = $this->user->getReturnUrl();
 
         $result = $this->user->login($identity, $sessionDuration ? null : 0);
-        if ($result && $returnUrl !== null) {
+        if ($result && $returnUrl && $returnUrl !== '/') {
             $this->user->setReturnUrl($returnUrl);
         }
 
