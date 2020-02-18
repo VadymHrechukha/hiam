@@ -12,6 +12,7 @@ namespace hiam\models;
 
 use filsh\yii2\oauth2server\models\OauthAccessTokens;
 use hiam\components\AuthKeyGenerator;
+use hiqdev\yii2\mfa\base\MfaIdentityInterface;
 use OAuth2\Storage\UserCredentialsInterface;
 use Yii;
 use yii\web\IdentityInterface;
@@ -28,7 +29,7 @@ use yii\web\IdentityInterface;
  * @property string $last_name
  * @property string $first_name
  */
-class Identity extends ProxyModel implements IdentityInterface, UserCredentialsInterface
+class Identity extends ProxyModel implements MfaIdentityInterface, UserCredentialsInterface
 {
     public $id;
     public $type;
@@ -221,5 +222,29 @@ class Identity extends ProxyModel implements IdentityInterface, UserCredentialsI
     public function __sleep()
     {
         return $this->attributes();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getUsername()
+    {
+        return $this->username;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getTotpSecret()
+    {
+        return $this->totp_secret;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getAllowedIps()
+    {
+        return $this->allowed_ips;
     }
 }
