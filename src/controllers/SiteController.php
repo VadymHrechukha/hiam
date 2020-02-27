@@ -86,7 +86,7 @@ class SiteController extends \hisite\controllers\SiteController
                 'class' => AccessControl::class,
                 'only' => array_merge($actions, ['lockscreen']),
                 'denyCallback' => function () {
-                    return $this->redirect([$this->user->getIsGuest() ? 'login' : 'lockscreen']);
+                    return $this->user->getIsGuest() ? $this->redirect(['login']) : $this->goBack();
                 },
                 'rules' => [
                     // ? - guest
