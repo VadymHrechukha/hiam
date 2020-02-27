@@ -227,7 +227,7 @@ class Identity extends ProxyModel implements MfaIdentityInterface, UserCredentia
     /**
      * @inheritDoc
      */
-    public function getUsername()
+    public function getUsername(): string
     {
         return $this->username;
     }
@@ -235,7 +235,7 @@ class Identity extends ProxyModel implements MfaIdentityInterface, UserCredentia
     /**
      * @inheritDoc
      */
-    public function getTotpSecret()
+    public function getTotpSecret(): string
     {
         return $this->totp_secret;
     }
@@ -243,8 +243,38 @@ class Identity extends ProxyModel implements MfaIdentityInterface, UserCredentia
     /**
      * @inheritDoc
      */
-    public function getAllowedIps()
+    public function getAllowedIps(): string
     {
         return $this->allowed_ips;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setUsername(string $username): MfaIdentityInterface
+    {
+        $this->username = $username;
+
+        return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setTotpSecret(string $secret): MfaIdentityInterface
+    {
+        $this->totp_secret = $secret;
+
+        return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function addAllowedIp(string $allowedIp): MfaIdentityInterface
+    {
+        $this->allowed_ips .= ($this->getAllowedIps() ? ',' : '') . $allowedIp;
+
+        return $this;
     }
 }
