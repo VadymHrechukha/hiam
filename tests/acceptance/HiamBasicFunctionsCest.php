@@ -36,16 +36,6 @@ class HiamBasicFunctionsCest
         $this->username = mt_rand(100000, 999999) . '+testuser@example.com';
     }
 
-    public function cleanUp(AcceptanceTester $I): void
-    {
-        try {
-            FileHelper::removeDirectory($I->getMailsDir());
-            FileHelper::removeDirectory(TokenHelper::getTokensDir());
-        } catch (\Throwable $exception) {
-            // seems to be already removed. it's fine
-        }
-    }
-
     /**
      * @before cleanUp
      * @param AcceptanceTester $I
@@ -121,12 +111,22 @@ class HiamBasicFunctionsCest
         $info = $this->getUserInfo();
         $restorePasswordPage->tryFillContactInfo($info);
         $restorePasswordPage->tryClickSubmitButton();
-        $I->wait(1);
+        $I->waitForPageUpdate();
         $resetTokenLink = TokenHelper::getTokenUrl($I);
         $resetPasswordPage = new ResetPassword($I, $resetTokenLink);
         $resetPasswordPage->tryFillContactInfo($info);
         $resetPasswordPage->tryClickSubmitButton();
         $I->waitForText('New password was saved.');
+    }
+
+    protected function cleanUp(AcceptanceTester $I): void
+    {
+        try {
+            FileHelper::removeDirectory($I->getMailsDir());
+            FileHelper::removeDirectory(TokenHelper::getTokensDir());
+        } catch (\Throwable $exception) {
+            // seems to be already removed. it's fine
+        }
     }
 
     protected function getUserInfo(): array
