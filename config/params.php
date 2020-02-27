@@ -58,4 +58,19 @@ return [
     RecaptchaConfig::PRIVATE_KEY    => null,
 
     'totpRedirectBackAction.url' => '/site/back',
+
+    'google_client_id'          => null,
+    'google_client_secret'      => null,
+    'facebook_client_id'        => null,
+    'facebook_client_secret'    => null,
+    'github_client_id'          => null,
+    'github_client_secret'      => null,
+    'linkedin_client_id'        => null,
+    'linkedin_client_secret'    => null,
+    'vkontakte_client_id'       => null,
+    'vkontakte_client_secret'   => null,
+    'yandex_client_id'          => null,
+    'yandex_client_secret'      => null,
+    'live_client_id'            => null,
+    'live_client_secret'        => null,
 ];

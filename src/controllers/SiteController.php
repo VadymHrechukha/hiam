@@ -42,7 +42,10 @@ use yii\web\Response;
  */
 class SiteController extends \hisite\controllers\SiteController
 {
-    public $defaultAction = 'lockscreen';
+    /**
+     * @inheritdoc
+     */
+    public $defaultAction = 'back';
 
     /**
      * @var ServiceInterface
@@ -86,7 +89,7 @@ class SiteController extends \hisite\controllers\SiteController
                 'class' => AccessControl::class,
                 'only' => array_merge($actions, ['lockscreen']),
                 'denyCallback' => function () {
-                    return $this->redirect([$this->user->getIsGuest() ? 'login' : 'lockscreen']);
+                    return $this->user->getIsGuest() ? $this->redirect(['login']) : $this->goBack();
                 },
                 'rules' => [
                     // ? - guest
@@ -212,7 +215,7 @@ class SiteController extends \hisite\controllers\SiteController
         $returnUrl = $this->user->getReturnUrl();
 
         $result = $this->user->login($identity, $sessionDuration ? null : 0);
-        if ($result && $returnUrl !== null) {
+        if ($result && $returnUrl && $returnUrl !== '/') {
             $this->user->setReturnUrl($returnUrl);
         }
 
@@ -327,7 +330,7 @@ class SiteController extends \hisite\controllers\SiteController
                 Yii::$app->session->setFlash('error', Yii::t('hiam', 'Sorry, we are unable to reset password for the provided username or email. Try to contact support team.'));
             }
 
-            return $this->goHome();
+            return $this->redirect('login');
         }
 
         $isCaptchaRequired = $this->isCaptchaRequired();
@@ -347,7 +350,7 @@ class SiteController extends \hisite\controllers\SiteController
                 Yii::$app->session->setFlash('error', Yii::t('hiam', 'Failed reset password. Please start over.'));
             }
 
-            return $this->goHome();
+            return $this->redirect('login');
         }
 
         return $this->render('resetPassword', compact('model', 'token'));
@@ -492,6 +495,7 @@ class SiteController extends \hisite\controllers\SiteController
                     ['email' => $user->email_confirmed ?? $user->email]
                 )
             );
+            Yii::$app->session->set(ConfirmEmail::SESSION_VAR_NAME, $user->email);
         } else {
             Yii::error('Failed to send email confirmation letter', __METHOD__);
         }
