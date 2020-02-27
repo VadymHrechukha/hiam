@@ -15,6 +15,7 @@ use hiam\components\AuthKeyGenerator;
 use hiqdev\yii2\mfa\base\MfaIdentityInterface;
 use OAuth2\Storage\UserCredentialsInterface;
 use Yii;
+use yii\helpers\StringHelper;
 use yii\web\IdentityInterface;
 
 /**
@@ -243,9 +244,9 @@ class Identity extends ProxyModel implements MfaIdentityInterface, UserCredentia
     /**
      * @inheritDoc
      */
-    public function getAllowedIps(): string
+    public function getAllowedIps(): array
     {
-        return $this->allowed_ips;
+        return StringHelper::explode($this->allowed_ips);
     }
 
     /**
