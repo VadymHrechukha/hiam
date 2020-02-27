@@ -246,7 +246,7 @@ class Identity extends ProxyModel implements MfaIdentityInterface, UserCredentia
      */
     public function getAllowedIps(): array
     {
-        return StringHelper::explode($this->allowed_ips);
+        return array_map('trim', StringHelper::explode($this->allowed_ips));
     }
 
     /**
