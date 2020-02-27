@@ -17,6 +17,7 @@ use hiam\tests\_support\Page\Login;
 use hiam\tests\_support\Page\ResetPassword;
 use hiam\tests\_support\Page\RestorePassword;
 use hiam\tests\_support\Page\SignUp;
+use hiam\tests\_support\Page\Transition;
 use yii\helpers\FileHelper;
 
 class HiamBasicFunctionsCest
@@ -59,6 +60,12 @@ class HiamBasicFunctionsCest
         $signupPage->tryClickAdditionalCheckboxes();
         $signupPage->tryClickAgreeTermsPrivacy();
         $signupPage->tryClickSubmitButton();
+        $I->waitForPageUpdate();
+
+        $transitionPage = new Transition($I);
+        $transitionPage->baseCheck();
+
+        $lockscreen = new Lockscreen($I);
         $I->waitForText($info['username']);
     }
 
@@ -75,7 +82,13 @@ class HiamBasicFunctionsCest
         $info = $this->getUserInfo();
         $loginPage->tryFillContactInfo($info);
         $loginPage->tryClickSubmitButton();
+
+        $transitionPage = new Transition($I);
+        $transitionPage->baseCheck();
+
+        $lockscreen = new Lockscreen($I);
         $I->waitForText($info['username']);
+
         $this->identity = $I->grabCookie('_identity');
         $I->assertNotEmpty($this->identity, 'cookie grabbed');
     }

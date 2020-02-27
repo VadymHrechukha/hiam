@@ -6,6 +6,7 @@ use hiam\tests\_support\AcceptanceTester;
 use hiam\tests\_support\Helper\TokenHelper;
 use hiam\tests\_support\Page\Lockscreen;
 use hiam\tests\_support\Page\SignUp;
+use hiam\tests\_support\Page\Transition;
 
 class ConfirmEmailCest
 {
@@ -20,6 +21,8 @@ class ConfirmEmailCest
 
         $this->doSignupActions($I, $user);
         $this->doEmailConfirmCheck($I, $user);
+
+        $lockscreen = new Lockscreen($I);
         $I->see($user['username']);
     }
 
@@ -35,6 +38,8 @@ class ConfirmEmailCest
         $this->doSignupActions($I, $user);
         $this->doLogout($I);
         $this->doEmailConfirmCheck($I, $user);
+
+        $lockscreen = new Lockscreen($I);
         $I->see('Sign in to Advanced Hosting');
     }
 
@@ -51,6 +56,8 @@ class ConfirmEmailCest
         $this->doLogout($I);
         $this->doSignupActions($I, $user2);
         $this->doEmailConfirmCheck($I, $user1);
+
+        $lockscreen = new Lockscreen($I);
         $I->waitForText($user2['username']);
     }
 
@@ -66,12 +73,19 @@ class ConfirmEmailCest
         $signupPage->tryClickAdditionalCheckboxes();
         $signupPage->tryClickAgreeTermsPrivacy();
         $signupPage->tryClickSubmitButton();
+        $I->waitForPageUpdate();
+
+        $transitionPage = new Transition($I);
+        $transitionPage->baseCheck();
+
+        $lockscreen = new Lockscreen($I);
         $I->waitForText($user['username']);
     }
 
     /**
      * @param AcceptanceTester $I
      * @param array $user
+     * @throws \Exception
      */
     private function doEmailConfirmCheck(AcceptanceTester $I, array $user): void
     {
