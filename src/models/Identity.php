@@ -238,7 +238,7 @@ class Identity extends ProxyModel implements MfaIdentityInterface, UserCredentia
      */
     public function getTotpSecret(): string
     {
-        return $this->totp_secret;
+        return $this->totp_secret ?? '';
     }
 
     /**
