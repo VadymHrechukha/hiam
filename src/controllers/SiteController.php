@@ -42,7 +42,10 @@ use yii\web\Response;
  */
 class SiteController extends \hisite\controllers\SiteController
 {
-    public $defaultAction = 'lockscreen';
+    /**
+     * @inheritdoc
+     */
+    public $defaultAction = 'back';
 
     /**
      * @var ServiceInterface
@@ -327,7 +330,7 @@ class SiteController extends \hisite\controllers\SiteController
                 Yii::$app->session->setFlash('error', Yii::t('hiam', 'Sorry, we are unable to reset password for the provided username or email. Try to contact support team.'));
             }
 
-            return $this->goHome();
+            return $this->redirect('login');
         }
 
         $isCaptchaRequired = $this->isCaptchaRequired();
@@ -347,7 +350,7 @@ class SiteController extends \hisite\controllers\SiteController
                 Yii::$app->session->setFlash('error', Yii::t('hiam', 'Failed reset password. Please start over.'));
             }
 
-            return $this->goHome();
+            return $this->redirect('login');
         }
 
         return $this->render('resetPassword', compact('model', 'token'));
