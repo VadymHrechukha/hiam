@@ -100,7 +100,7 @@ class SiteController extends \hisite\controllers\SiteController
                     ],
                     // @ - authenticated
                     [
-                        'actions' => ['lockscreen', 'privacy-policy', 'terms', 'resend-verification-email'],
+                        'actions' => ['lockscreen', 'privacy-policy', 'terms', 'resend-verification-email', 'back'],
                         'roles' => ['@'],
                         'allow' => true,
                     ],
