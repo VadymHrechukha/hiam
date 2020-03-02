@@ -252,16 +252,6 @@ class Identity extends ProxyModel implements MfaIdentityInterface, UserCredentia
     /**
      * @inheritDoc
      */
-    public function setUsername(string $username): MfaIdentityInterface
-    {
-        $this->username = $username;
-
-        return $this;
-    }
-
-    /**
-     * @inheritDoc
-     */
     public function setTotpSecret(string $secret): MfaIdentityInterface
     {
         $this->totp_secret = $secret;
