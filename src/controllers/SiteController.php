@@ -45,7 +45,7 @@ class SiteController extends \hisite\controllers\SiteController
     /**
      * @inheritdoc
      */
-    public $defaultAction = 'back';
+    public $defaultAction = 'lockscreen';
 
     /**
      * @var ServiceInterface
