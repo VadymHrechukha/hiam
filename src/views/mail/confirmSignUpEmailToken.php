@@ -6,7 +6,7 @@ use yii\helpers\Html;
 /** @var yii\web\IdentityInterface $user */
 /** @var yii\mail\MessageInterface $message */
 /** @var string $token */
-$confirmLink = Yii::$app->urlManager->createAbsoluteUrl(['site/confirm-email', 'token' => (string) $token]);
+$confirmLink = Yii::$app->urlManager->createAbsoluteUrl(['site/confirm-sign-up-email', 'token' => (string) $token]);
 
 $org = Yii::$app->params['organization.name'];
 

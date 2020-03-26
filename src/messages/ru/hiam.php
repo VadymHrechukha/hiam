@@ -68,8 +68,6 @@ return [
     'Enter new email' => 'Введите новый е-мейл',
     '{label} has not been changed' => '{label} не был изменен',
     '{label} has been successfully changed' => '{label} был успешно изменен',
-    'Password' => 'Пароль',
-    'Email' => 'Е-мейл',
     'The current password is incorrect' => 'Текущий пароль неверен',
     'Incorrect password' => 'Неверный пароль',
     'Login' => 'Логин',
