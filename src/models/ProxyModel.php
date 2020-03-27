@@ -47,6 +47,7 @@ abstract class ProxyModel extends \yii\base\Model
         if (!$store->save()) {
             return false;
         }
+        $cond = $store->getAttributes(static::primaryKey());
         $model = static::findOne($cond);
         $this->setAttributes($model->getAttributes());
 

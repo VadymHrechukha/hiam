@@ -129,7 +129,7 @@ class Identity extends ProxyModel implements MfaIdentityInterface, UserCredentia
 
     public static function primaryKey()
     {
-        return ['username'];
+        return ['id'];
     }
 
     /**
