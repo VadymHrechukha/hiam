@@ -48,6 +48,7 @@ return [
     'Sorry, we are unable to reset password for the provided username or email. Try to contact support team.' => 'Извините, мы не можем восстановить пароль для указанного имени пользователя или email. Попробуйте связаться со службой поддержки.',
     'The entered value is not an email address.' => 'Введенное значение не является емейл адресом.',
     'This email has already been taken.' => 'Этот адрес уже занят.',
+    '{attribute} has already been taken' => '{attribute} уже занят.',
     'Unable to verify your data submission.' => 'Не удалось проверить переданные данные.',
     'Your account has been successfully created.' => 'Аккаунт был создан успешно.',
     'Your email was confirmed!' => 'Ваш email был подтверждён!',

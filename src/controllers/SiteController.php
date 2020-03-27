@@ -452,7 +452,12 @@ class SiteController extends \hisite\controllers\SiteController
 
         $errors = implode("; \n", $model->getFirstErrors());
         if (!$errors) {
-            $errors = Yii::t('hiam', '{label} has not been changed', ['label' => $sender['label']]);
+            $errors = Yii::t('hiam', '{label} has not been changed: {message}',
+                [
+                    'label' => $sender['label'],
+                    'message' => $errors,
+                ]
+            );
         }
         Yii::$app->session->setFlash('error', $errors);
 
