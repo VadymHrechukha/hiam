@@ -83,7 +83,7 @@ class SiteController extends \hisite\controllers\SiteController
             'confirm-password', 'restore-password', 'reset-password',
             'terms', 'privacy-policy',
         ];
-        $authenticatedAction = [
+        $authenticatedActions = [
             'lockscreen', 'privacy-policy', 'terms',
             'resend-verification-email', 'back',
             'change-password', 'change-email',
@@ -92,7 +92,7 @@ class SiteController extends \hisite\controllers\SiteController
         return array_merge(parent::behaviors(), [
             'access' => [
                 'class' => AccessControl::class,
-                'only' => array_merge($authenticatedAction, $guestActions),
+                'only' => array_merge($authenticatedActions, $guestActions),
                 'denyCallback' => function () {
                     return $this->user->getIsGuest() ? $this->redirect(['login']) : $this->goBack();
                 },
@@ -105,7 +105,7 @@ class SiteController extends \hisite\controllers\SiteController
                     ],
                     // @ - authenticated
                     [
-                        'actions' => $authenticatedAction,
+                        'actions' => $authenticatedActions,
                         'roles' => ['@'],
                         'allow' => true,
                     ],
