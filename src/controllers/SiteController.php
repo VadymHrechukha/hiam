@@ -78,29 +78,34 @@ class SiteController extends \hisite\controllers\SiteController
 
     public function behaviors()
     {
-        $actions = [
+        $guestActions = [
             'signup', 'login', 'remote-proceed',
             'confirm-password', 'restore-password', 'reset-password',
             'terms', 'privacy-policy',
+        ];
+        $authenticatedActions = [
+            'lockscreen', 'privacy-policy', 'terms',
+            'resend-verification-email', 'back',
+            'change-password', 'change-email',
         ];
 
         return array_merge(parent::behaviors(), [
             'access' => [
                 'class' => AccessControl::class,
-                'only' => array_merge($actions, ['lockscreen']),
+                'only' => array_merge($authenticatedActions, $guestActions),
                 'denyCallback' => function () {
                     return $this->user->getIsGuest() ? $this->redirect(['login']) : $this->goBack();
                 },
                 'rules' => [
                     // ? - guest
                     [
-                        'actions' => $actions,
+                        'actions' => $guestActions,
                         'roles' => ['?'],
                         'allow' => true,
                     ],
                     // @ - authenticated
                     [
-                        'actions' => ['lockscreen', 'privacy-policy', 'terms', 'resend-verification-email', 'back'],
+                        'actions' => $authenticatedActions,
                         'roles' => ['@'],
                         'allow' => true,
                     ],
@@ -452,7 +457,12 @@ class SiteController extends \hisite\controllers\SiteController
 
         $errors = implode("; \n", $model->getFirstErrors());
         if (!$errors) {
-            $errors = Yii::t('hiam', '{label} has not been changed', ['label' => $sender['label']]);
+            $errors = Yii::t('hiam', '{label} has not been changed: {message}',
+                [
+                    'label' => $sender['label'],
+                    'message' => $errors,
+                ]
+            );
         }
         Yii::$app->session->setFlash('error', $errors);
 

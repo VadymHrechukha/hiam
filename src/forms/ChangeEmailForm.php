@@ -41,16 +41,24 @@ class ChangeEmailForm extends Model
             ['login', 'string'],
             ['email', 'email'],
             [['login', 'seller_id', 'email'], 'required'],
-            [
-                'email', 'unique',
-                'targetClass' => Yii::$app->user->storageClasses['identity'],
-                'targetAttribute' => ['email', 'seller_id'],
-                'message' => Yii::t('yii', '{attribute} "{value}" has already been taken.'),
-                'when' => function () {
-                    return $this->login && $this->seller_id;
-                },
-            ],
+            [['email'], 'validateEmail'],
         ];
+    }
+
+    public function validateEmail($attribute, $params)
+    {
+        /** @var Identity $identity */
+        $identity = Yii::$app->user->identityClass;
+        $existing = $identity::findOne(['username' => $this->{$attribute}]);
+        if (!empty($existing)) {
+            $this->addError($attribute, Yii::t('hiam', '{attribute} has already been taken',
+                [
+                    'attribute' => $attribute,
+                ]
+            ));
+            return false;
+        }
+        return true;
     }
 
     /**
