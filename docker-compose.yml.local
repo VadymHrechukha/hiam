@@ -43,7 +43,7 @@ networks:
       name: "${HIAPI_SITE}"
   pgsql-network:
     external:
-      name: "pgsql-${HIAPI_SITE}"
+      name: "pgsql-${HIAPI_DIST}"
   proxy-network:
     external:
       name: "nginx-proxy-network-${REAL_IP}"
@@ -51,4 +51,4 @@ networks:
 volumes:
   var-volume:
     external:
-      name: "var-${HIAPI_SITE}"
+      name: "var-${HIAPI_DIST}"

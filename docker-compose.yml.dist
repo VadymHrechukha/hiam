@@ -40,7 +40,7 @@ networks:
     driver: bridge
   hiapi-network:
     external:
-      name: "${HIAPI_SITE}"
+      name: "${HIAPI_DIST}"
   pgsql-network:
     external:
       name: "pgsql-${HIAPI_SITE}"
@@ -51,4 +51,4 @@ networks:
 volumes:
   var-volume:
     external:
-      name: "var-${HIAPI_SITE}"
+      name: "var-${HIAPI_DIST}"
