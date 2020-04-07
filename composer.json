@@ -49,7 +49,7 @@
         }
     ],
     "require": {
-        "php": ">5.5",
+        "php": "^7.4",
         "yiisoft/yii2": "~2.0.0",
         "yiisoft/yii2-debug": "~2.0.0",
         "yiisoft/yii2-bootstrap": "~2.0.0",
