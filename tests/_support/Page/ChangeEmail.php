@@ -27,6 +27,6 @@ class ChangeEmail extends AbstractHiamPage
      */
     public function tryFillContactInfo(array $info): void
     {
-
+        $this->tester->fillField(['name' => 'ChangeEmailForm[email]'], $info['new_username']);
     }
 }

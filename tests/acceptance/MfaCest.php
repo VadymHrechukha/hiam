@@ -57,6 +57,7 @@ final class MfaCest
 
     /**
      * @param AcceptanceTester $I
+     * @throws \Exception
      */
     protected function loginToLockscreen(AcceptanceTester $I): void
     {

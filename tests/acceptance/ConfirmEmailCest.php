@@ -7,10 +7,12 @@ use hiam\tests\_support\Helper\TokenHelper;
 use hiam\tests\_support\Page\Lockscreen;
 use hiam\tests\_support\Page\SignUp;
 use hiam\tests\_support\Page\Transition;
+use yii\helpers\FileHelper;
 
 class ConfirmEmailCest
 {
     /**
+     * @before cleanUp
      * @param AcceptanceTester $I
      * @throws \Exception
      */
@@ -20,13 +22,14 @@ class ConfirmEmailCest
         [$user,] = $this->getUsersInfo();
 
         $this->doSignupActions($I, $user);
-        $this->doEmailConfirmCheck($I, $user);
+        $this->doEmailConfirmCheck($I);
 
         $lockscreen = new Lockscreen($I);
         $I->see($user['username']);
     }
 
     /**
+     * @before cleanUp
      * @param AcceptanceTester $I
      * @throws \Exception
      */
@@ -37,13 +40,14 @@ class ConfirmEmailCest
 
         $this->doSignupActions($I, $user);
         $this->doLogout($I);
-        $this->doEmailConfirmCheck($I, $user);
+        $this->doEmailConfirmCheck($I);
 
         $lockscreen = new Lockscreen($I);
         $I->see('Sign in to Advanced Hosting');
     }
 
     /**
+     * @before cleanUp
      * @param AcceptanceTester $I
      * @throws \Exception
      */
@@ -55,7 +59,7 @@ class ConfirmEmailCest
         $this->doSignupActions($I, $user1);
         $this->doLogout($I);
         $this->doSignupActions($I, $user2);
-        $this->doEmailConfirmCheck($I, $user1);
+        $this->doEmailConfirmCheck($I);
 
         $lockscreen = new Lockscreen($I);
         $I->waitForText($user2['username']);
@@ -87,7 +91,7 @@ class ConfirmEmailCest
      * @param array $user
      * @throws \Exception
      */
-    private function doEmailConfirmCheck(AcceptanceTester $I, array $user): void
+    private function doEmailConfirmCheck(AcceptanceTester $I): void
     {
         $token = TokenHelper::findLastToken();
         $I->assertNotEmpty($token, 'token exists');
@@ -98,6 +102,16 @@ class ConfirmEmailCest
     {
         $lockscreenPage = new Lockscreen($I);
         $lockscreenPage->tryLogout();
+    }
+
+    protected function cleanUp(AcceptanceTester $I): void
+    {
+        try {
+            FileHelper::removeDirectory($I->getMailsDir());
+            FileHelper::removeDirectory(TokenHelper::getTokensDir());
+        } catch (\Throwable $exception) {
+            // seems to be already removed. it's fine
+        }
     }
 
     /**

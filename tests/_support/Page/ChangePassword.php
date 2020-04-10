@@ -27,6 +27,9 @@ class ChangePassword extends AbstractHiamPage
      */
     public function tryFillContactInfo(array $info): void
     {
-
+        $I = $this->tester;
+        $I->fillField(['name' => 'ChangePasswordForm[current_password]'], $info['password']);
+        $I->fillField(['name' => 'ChangePasswordForm[new_password]'],     $info['new_password']);
+        $I->fillField(['name' => 'ChangePasswordForm[confirm_password]'], $info['new_password']);
     }
 }

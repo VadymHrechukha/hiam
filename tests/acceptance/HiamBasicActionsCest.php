@@ -20,7 +20,7 @@ use hiam\tests\_support\Page\SignUp;
 use hiam\tests\_support\Page\Transition;
 use yii\helpers\FileHelper;
 
-class HiamBasicFunctionsCest
+class HiamBasicActionsCest
 {
     /** @var string */
     private $username;
