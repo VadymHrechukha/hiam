@@ -21,7 +21,6 @@ services:
       - "VIRTUAL_HOST=${HOSTS}"
       - "LETSENCRYPT_HOST=${HOSTS}"
       - "LETSENCRYPT_EMAIL=devteam@hiqdev.com"
-      - "LETSENCRYPT_STANDALONE_CERTS=${LETSENCRYPT_STANDALONE_CERTS}"
 
   php-fpm:
     image: hiqdev/php:7.4-fpm
@@ -39,10 +38,7 @@ networks:
     driver: bridge
   hiapi-network:
     external:
-      name: "${HIAPI_DIST}"
-  pgsql-network:
-    external:
-      name: "pgsql-${HIAPI_SITE}"
+      name: "${HIAPI_SITE}"
   proxy-network:
     external:
       name: "nginx-proxy-network-${REAL_IP}"
@@ -50,4 +46,4 @@ networks:
 volumes:
   var-volume:
     external:
-      name: "var-${HIAPI_DIST}"
+      name: "var-${HIAPI_SITE}"
