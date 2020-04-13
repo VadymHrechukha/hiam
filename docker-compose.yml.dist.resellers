@@ -30,10 +30,8 @@ services:
       - var-volume:/HIAPI_VAR
     networks:
       - local-network
-      - pgsql-network
     environment:
       - "ENV=${ENV}"
-      - "PHP_IDE_CONFIG=serverName=${HOSTS}"
 
 networks:
   local-network:
@@ -41,9 +39,6 @@ networks:
   hiapi-network:
     external:
       name: "${HIAPI_SITE}"
-  pgsql-network:
-    external:
-      name: "pgsql-${HIAPI_DIST}"
   proxy-network:
     external:
       name: "nginx-proxy-network-${REAL_IP}"
@@ -51,4 +46,4 @@ networks:
 volumes:
   var-volume:
     external:
-      name: "var-${HIAPI_DIST}"
+      name: "var-${HIAPI_SITE}"

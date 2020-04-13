@@ -24,7 +24,7 @@ services:
       - "LETSENCRYPT_STANDALONE_CERTS=${LETSENCRYPT_STANDALONE_CERTS}"
 
   php-fpm:
-    image: hiqdev/php:7.3-fpm
+    image: hiqdev/php:7.4-fpm
     volumes:
       - ./:/app
       - ./.docker/php/var/log/php:/var/log/php
@@ -43,7 +43,7 @@ networks:
       name: "${HIAPI_SITE}"
   pgsql-network:
     external:
-      name: "pgsql-${HIAPI_SITE}"
+      name: "pgsql-${HIAPI_DIST}"
   proxy-network:
     external:
       name: "nginx-proxy-network-${REAL_IP}"
@@ -51,4 +51,4 @@ networks:
 volumes:
   var-volume:
     external:
-      name: "var-${HIAPI_SITE}"
+      name: "var-${HIAPI_DIST}"
