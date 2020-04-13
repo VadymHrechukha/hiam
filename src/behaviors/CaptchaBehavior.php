@@ -50,6 +50,10 @@ class CaptchaBehavior extends ActionFilter
      * @var \Closure|null
      */
     private $incrementClosure;
+    /**
+     * @var boolean enable to skip captchas. Useful for development purposes.
+     */
+    public $isDisabled = false;
 
     /**
      * {@inheritdoc}
@@ -59,7 +63,7 @@ class CaptchaBehavior extends ActionFilter
         $actionId = $action->id;
 
         $limit = $this->limitPerAction[$actionId] ?? null;
-        if ($limit === null) {
+        if ($limit === null || $this->isDisabled) {
             return true;
         }
 

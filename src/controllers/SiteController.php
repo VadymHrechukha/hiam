@@ -29,6 +29,7 @@ use hiqdev\yii2\mfa\filters\ValidateAuthenticationFilter;
 use hisite\actions\RedirectAction;
 use hisite\actions\RenderAction;
 use hisite\actions\ValidateAction;
+use vintage\recaptcha\helpers\RecaptchaConfig;
 use Yii;
 use yii\authclient\AuthAction;
 use yii\authclient\ClientInterface;
@@ -117,6 +118,7 @@ class SiteController extends \hisite\controllers\SiteController
             ],
             'captchaFilter' => [
                 'class' => CaptchaBehavior::class,
+                'isDisabled' => empty(Yii::$app->params[RecaptchaConfig::SITE_KEY]) || YII_ENV_DEV,
                 'only' => ['signup', 'login', 'restore-password'],
                 'limitPerAction' => [
                     'signup' => [1, CaptchaBehavior::PER_DAY],
