@@ -9,7 +9,7 @@
  */
 
 return [
-    'PARAMS_LOCATION' => dirname(__DIR__) . '/vendor/hiqdev/composer-config-plugin-output/acceptance.php',
+    'PARAMS_LOCATION' => dirname(__DIR__) . '/vendor/yiisoft/composer-config-plugin-output/acceptance.php',
     'YII2_CONFIG_LOCATION' => dirname(__DIR__) . '/tests/acceptance/config/suite.php',
 
     'COMMON_TESTS_LOCATION' => dirname(__DIR__) . '/tests',
