@@ -5,16 +5,28 @@ namespace hiam\tests\acceptance;
 use hiam\tests\_support\AcceptanceTester;
 use hiam\tests\_support\Helper\TotpHelper;
 use hiam\tests\_support\Page\Lockscreen;
-use hiam\tests\_support\Page\Login;
+use hiam\tests\_support\Helper\BasicHiamActions;
 use hiam\tests\_support\Page\TOTP;
 use hiam\tests\_support\Page\Transition;
 
-final class MfaCest
+final class MfaCest extends BasicHiamActions
 {
     use TotpHelper;
 
+    /** @var string */
+    private string $username;
+
+    /** @var string */
+    private string $password;
+
+    public function __construct()
+    {
+        $this->username = uniqid() . 'test@test.test';
+        $this->password = 'random';
+    }
+
     /**
-     * @before loginToLockscreen
+     * @before signupToLockscreen
      * @param AcceptanceTester $I
      * @throws \Exception
      */
@@ -57,11 +69,12 @@ final class MfaCest
 
     /**
      * @param AcceptanceTester $I
+     * @throws \Exception
      */
-    protected function loginToLockscreen(AcceptanceTester $I): void
+    protected function signupToLockscreen(AcceptanceTester $I): void
     {
         $info = $this->getUserInfo();
-        $this->login($I, $info);
+        $this->doSignupActions($I, $info);
 
         $this->transitionActions($I);
     }
@@ -73,8 +86,7 @@ final class MfaCest
     protected function loginWithMFA(AcceptanceTester $I): void
     {
         $info = $this->getUserInfo();
-        $this->login($I, $info);
-        $I->wait(2);
+        $this->doLogin($I, $info);
 
         $totpPage = new TOTP($I);
         $I->see('Two-Factor Authentication');
@@ -86,18 +98,6 @@ final class MfaCest
         $totpPage->tryClickSubmitButton();
 
         $this->transitionActions($I);
-    }
-
-    /**
-     * @param AcceptanceTester $I
-     * @param array $info
-     * @throws \Exception
-     */
-    protected function login(AcceptanceTester $I, array $info): void
-    {
-        $loginPage = new Login($I);
-        $loginPage->tryFillContactInfo($info);
-        $loginPage->tryClickSubmitButton();
     }
 
     /**
@@ -117,11 +117,11 @@ final class MfaCest
     /**
      * @return array
      */
-    private function getUserInfo(): array
+    protected function getUserInfo(): array
     {
         return [
-            'username' => 'hipanel_test_user',
-            'password' => 'random',
+            'username' => $this->username,
+            'password' => $this->password,
         ];
     }
 }

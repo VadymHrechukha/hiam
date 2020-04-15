@@ -20,16 +20,16 @@ use hiam\tests\_support\Page\SignUp;
 use hiam\tests\_support\Page\Transition;
 use yii\helpers\FileHelper;
 
-class HiamBasicFunctionsCest
+class HiamBasicActionsCest
 {
     /** @var string */
-    private $username;
+    private string $username;
 
     /** @var string */
-    private $password = '123456';
+    private string $password = '123456';
 
     /** @var string */
-    private $identity;
+    private string $identity;
 
     public function __construct()
     {

@@ -14,6 +14,10 @@ use yii\base\InvalidArgumentException;
  */
 trait TotpHelper
 {
+    /**
+     * Path to session cache in docker environment
+     * @var string
+     */
     protected $sessionsPath = '/tmp';
 
     /**
@@ -31,7 +35,7 @@ trait TotpHelper
         /** @var \RobThree\Auth\TwoFactorAuth $worker */
         $worker = $totp->getWorker();
 
-        $cookie = $I->grabCookie('PHPSESSID');
+        $cookie = $I->grabCookie(ini_get('session.name'));
         $sessionFile = file_get_contents($this->sessionsPath . '/sess_'.$cookie);
         $session = $this->sessionUnseriazlize($sessionFile);
 
