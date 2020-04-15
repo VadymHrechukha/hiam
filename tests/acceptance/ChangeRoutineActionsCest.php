@@ -92,7 +92,7 @@ final class ChangeRoutineActionsCest extends BasicHiamActions
         $token = TokenHelper::findLastToken();
         $I->assertNotEmpty($token, 'token exists');
         $I->amOnPage('/site/confirm-email?token=' . $token);
-        $I->wait(3);
+        $I->waitForText('Your email was confirmed!');
     }
 
     /**

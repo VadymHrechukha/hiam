@@ -74,6 +74,7 @@ class ConfirmEmailCest extends BasicHiamActions
         $token = TokenHelper::findLastToken();
         $I->assertNotEmpty($token, 'token exists');
         $I->amOnPage('/site/confirm-sign-up-email?token=' . $token);
+        $I->waitForText('Your email was confirmed!');
     }
 
     private function doLogout(AcceptanceTester $I): void
