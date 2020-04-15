@@ -45,9 +45,6 @@ abstract class BasicHiamActions
         $loginPage->tryFillContactInfo($info);
         $loginPage->tryClickSubmitButton();
         $I->wait(1);
-
-        $lockscreen = new Lockscreen($I);
-        $I->waitForText($info['username']);
     }
 
     /**

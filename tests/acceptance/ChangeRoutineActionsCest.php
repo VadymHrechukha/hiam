@@ -72,6 +72,17 @@ final class ChangeRoutineActionsCest extends BasicHiamActions
     }
 
     /**
+     * @inheritDoc
+     */
+    protected function doLogin(AcceptanceTester $I, array $info): void
+    {
+        parent::doLogin($I, $info);
+
+//        $lockscreen = new Lockscreen($I);
+//        $I->waitForText($info['username']);
+    }
+
+    /**
      * @param AcceptanceTester $I
      * @param array $user
      * @throws \Exception
@@ -91,7 +102,7 @@ final class ChangeRoutineActionsCest extends BasicHiamActions
     {
         return [
             'username' => uniqid() . 'test@test.test',
-            'new_username'=> 'new_test_user@test.test',
+            'new_username'=> uniqid() . 'new_test_user@test.test',
             'password' => 'random',
             'new_password' => 'random1',
         ];
