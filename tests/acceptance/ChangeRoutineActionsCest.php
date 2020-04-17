@@ -5,6 +5,7 @@ namespace hiam\tests\acceptance;
 use hiam\tests\_support\AcceptanceTester;
 use hiam\tests\_support\Helper\BasicHiamActions;
 use hiam\tests\_support\Helper\TokenHelper;
+use hiam\tests\_support\Helper\UserSessionTrait;
 use hiam\tests\_support\Page\ChangeEmail;
 use hiam\tests\_support\Page\ChangePassword;
 use hiam\tests\_support\Page\Lockscreen;
@@ -12,6 +13,8 @@ use hiam\tests\_support\Page\Transition;
 
 final class ChangeRoutineActionsCest extends BasicHiamActions
 {
+    use UserSessionTrait;
+
     /**
      * @before cleanUp
      * @param AcceptanceTester $I
@@ -89,6 +92,9 @@ final class ChangeRoutineActionsCest extends BasicHiamActions
     {
         $token = TokenHelper::findTokenByActionAndName($action, $user['username']);
         $I->assertNotEmpty($token, 'token exists');
+
+        codecept_debug($this->getUsersSession($I));
+
         $I->amOnPage("/site/$action?token=$token");
 
         $transitionPage = new Transition($I);
