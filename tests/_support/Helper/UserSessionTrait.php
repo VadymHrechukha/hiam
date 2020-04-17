@@ -19,7 +19,7 @@ trait UserSessionTrait
      * @param AcceptanceTester $I
      * @return array
      */
-    public function getUsersSession(AcceptanceTester $I): array
+    protected function getUsersSession(AcceptanceTester $I): array
     {
         $cookie = $I->grabCookie(ini_get('session.name'));
         $sessionFile = file_get_contents($this->sessionsPath . '/sess_'.$cookie);
