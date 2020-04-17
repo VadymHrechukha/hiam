@@ -8,10 +8,7 @@ use hiam\tests\_support\Helper\TokenHelper;
 use hiam\tests\_support\Page\ChangeEmail;
 use hiam\tests\_support\Page\ChangePassword;
 use hiam\tests\_support\Page\Lockscreen;
-use hiam\tests\_support\Page\Login;
-use hiam\tests\_support\Page\SignUp;
 use hiam\tests\_support\Page\Transition;
-use yii\helpers\FileHelper;
 
 final class ChangeRoutineActionsCest extends BasicHiamActions
 {
@@ -54,18 +51,18 @@ final class ChangeRoutineActionsCest extends BasicHiamActions
         $info = $this->getUserInfo();
         $this->doSignupActions($I, $info);
 
-        $changePassword = new ChangeEmail($I);
-        $changePassword->tryFillContactInfo($info);
-        $changePassword->tryClickSubmitButton();
+        $changeEmail = new ChangeEmail($I);
+        $changeEmail->tryFillContactInfo($info);
+        $changeEmail->tryClickSubmitButton();
 
         $transition = new Transition($I);
         $I->waitForText('Email has been successfully changed');
         $transition->baseCheck();
 
-        $this->doEmailConfirmCheck($I);
+        $this->doEmailConfirmCheck($I, $info, 'confirm-email');
 
         $lockscreen = new Lockscreen($I);
-        $lockscreen->tryLogout();
+        $changeEmail->tryLogout();
 
         $info['username'] = $info['new_username'];
         $this->doLogin($I, $info);
@@ -78,25 +75,29 @@ final class ChangeRoutineActionsCest extends BasicHiamActions
     {
         parent::doLogin($I, $info);
 
-//        $lockscreen = new Lockscreen($I);
-//        $I->waitForText($info['username']);
+        $lockscreen = new Lockscreen($I);
+        $I->waitForText($info['username']);
     }
 
     /**
      * @param AcceptanceTester $I
      * @param array $user
+     * @param string $action
      * @throws \Exception
      */
-    private function doEmailConfirmCheck(AcceptanceTester $I): void
+    private function doEmailConfirmCheck(AcceptanceTester $I, array $user, string $action): void
     {
-        $token = TokenHelper::findLastToken();
+        $token = TokenHelper::findTokenByActionAndName($action, $user['username']);
         $I->assertNotEmpty($token, 'token exists');
-        $I->amOnPage('/site/confirm-email?token=' . $token);
+        $I->amOnPage("/site/$action?token=$token");
+
+        $transitionPage = new Transition($I);
         $I->waitForText('Your email was confirmed!');
+        $transitionPage->baseCheck();
     }
 
     /**
-     * @return array
+     * @inheritDoc
      */
     protected function getUserInfo(): array
     {

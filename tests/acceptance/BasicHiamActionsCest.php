@@ -11,16 +11,14 @@
 namespace hiam\tests\acceptance;
 
 use hiam\tests\_support\AcceptanceTester;
+use hiam\tests\_support\Helper\BasicHiamActions;
 use hiam\tests\_support\Helper\TokenHelper;
 use hiam\tests\_support\Page\Lockscreen;
-use hiam\tests\_support\Page\Login;
 use hiam\tests\_support\Page\ResetPassword;
 use hiam\tests\_support\Page\RestorePassword;
-use hiam\tests\_support\Page\SignUp;
 use hiam\tests\_support\Page\Transition;
-use yii\helpers\FileHelper;
 
-class HiamBasicActionsCest
+class BasicHiamActionsCest extends BasicHiamActions
 {
     /** @var string */
     private string $username;
@@ -44,19 +42,8 @@ class HiamBasicActionsCest
     public function signup(AcceptanceTester $I): void
     {
         $I->wantTo('signup to hiam');
-        $signupPage = new SignUp($I);
         $info = $this->getUserInfo();
-        $signupPage->tryFillContactInfo($info);
-        $signupPage->tryClickAdditionalCheckboxes();
-        $signupPage->tryClickAgreeTermsPrivacy();
-        $signupPage->tryClickSubmitButton();
-        $I->waitForPageUpdate();
-
-        $transitionPage = new Transition($I);
-        $transitionPage->baseCheck();
-
-        $lockscreen = new Lockscreen($I);
-        $I->waitForText($info['username']);
+        $this->doSignupActions($I, $info);
     }
 
     /**
@@ -68,10 +55,8 @@ class HiamBasicActionsCest
     public function login(AcceptanceTester $I): void
     {
         $I->wantTo('login to hiam');
-        $loginPage = new Login($I);
         $info = $this->getUserInfo();
-        $loginPage->tryFillContactInfo($info);
-        $loginPage->tryClickSubmitButton();
+        $this->doLogin($I, $info);
 
         $transitionPage = new Transition($I);
         $transitionPage->baseCheck();
@@ -119,16 +104,9 @@ class HiamBasicActionsCest
         $I->waitForText('New password was saved.');
     }
 
-    protected function cleanUp(AcceptanceTester $I): void
-    {
-        try {
-            FileHelper::removeDirectory($I->getMailsDir());
-            FileHelper::removeDirectory(TokenHelper::getTokensDir());
-        } catch (\Throwable $exception) {
-            // seems to be already removed. it's fine
-        }
-    }
-
+    /**
+     * @inheritDoc
+     */
     protected function getUserInfo(): array
     {
         return [

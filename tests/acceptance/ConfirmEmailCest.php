@@ -6,9 +6,7 @@ use hiam\tests\_support\AcceptanceTester;
 use hiam\tests\_support\Helper\BasicHiamActions;
 use hiam\tests\_support\Helper\TokenHelper;
 use hiam\tests\_support\Page\Lockscreen;
-use hiam\tests\_support\Page\SignUp;
 use hiam\tests\_support\Page\Transition;
-use yii\helpers\FileHelper;
 
 class ConfirmEmailCest extends BasicHiamActions
 {
@@ -23,7 +21,7 @@ class ConfirmEmailCest extends BasicHiamActions
         [$user,] = $this->getUserInfo();
 
         $this->doSignupActions($I, $user);
-        $this->doEmailConfirmCheck($I);
+        $this->doEmailConfirmCheck($I, $user, 'confirm-sign-up-email');
 
         $lockscreen = new Lockscreen($I);
         $I->see($user['username']);
@@ -41,7 +39,7 @@ class ConfirmEmailCest extends BasicHiamActions
 
         $this->doSignupActions($I, $user);
         $this->doLogout($I);
-        $this->doEmailConfirmCheck($I);
+        $this->doEmailConfirmCheck($I, $user, 'confirm-sign-up-email');
 
         $lockscreen = new Lockscreen($I);
         $I->see('Sign in to Advanced Hosting');
@@ -60,7 +58,7 @@ class ConfirmEmailCest extends BasicHiamActions
         $this->doSignupActions($I, $user1);
         $this->doLogout($I);
         $this->doSignupActions($I, $user2);
-        $this->doEmailConfirmCheck($I);
+        $this->doEmailConfirmCheck($I, $user2, 'confirm-sign-up-email');
 
         $lockscreen = new Lockscreen($I);
         $I->waitForText($user2['username']);
@@ -68,29 +66,29 @@ class ConfirmEmailCest extends BasicHiamActions
 
     /**
      * @param AcceptanceTester $I
+     * @param array $user
+     * @param string $action
+     * @throws \Exception
      */
-    private function doEmailConfirmCheck(AcceptanceTester $I): void
+    private function doEmailConfirmCheck(AcceptanceTester $I, array $user, string $action): void
     {
-        $token = TokenHelper::findLastToken();
+        $token = TokenHelper::findTokenByActionAndName($action, $user['username']);
         $I->assertNotEmpty($token, 'token exists');
-        $I->amOnPage('/site/confirm-sign-up-email?token=' . $token);
+        $I->amOnPage("/site/$action?token=$token");
+
+        $transitionPage = new Transition($I);
         $I->waitForText('Your email was confirmed!');
+        $transitionPage->baseCheck();
     }
 
+    /**
+     * @param AcceptanceTester $I
+     * @throws \Exception
+     */
     private function doLogout(AcceptanceTester $I): void
     {
         $lockscreenPage = new Lockscreen($I);
         $lockscreenPage->tryLogout();
-    }
-
-    protected function cleanUp(AcceptanceTester $I): void
-    {
-        try {
-            FileHelper::removeDirectory($I->getMailsDir());
-            FileHelper::removeDirectory(TokenHelper::getTokensDir());
-        } catch (\Throwable $exception) {
-            // seems to be already removed. it's fine
-        }
     }
 
     /**

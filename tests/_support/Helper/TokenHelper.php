@@ -34,6 +34,18 @@ final class TokenHelper
     }
 
     /**
+     * @param string $action
+     * @param string $username
+     * @return string
+     */
+    public static function findTokenByActionAndName(string $action, string $username): string
+    {
+        $tokensDir = static::getTokensDir();
+
+        return exec("grep -R $action $tokensDir | grep $username | cut -d ':' -f 1 | rev | cut -d '/' -f 1 | rev");
+    }
+
+    /**
      * @return bool|string
      */
     public static function getTokensDir()

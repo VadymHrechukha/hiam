@@ -3,9 +3,9 @@
 namespace hiam\tests\acceptance;
 
 use hiam\tests\_support\AcceptanceTester;
-use hiam\tests\_support\Page\Login;
+use hiam\tests\_support\Helper\BasicHiamActions;
 
-final class BasicActionsCest
+final class ControllerAccessCest extends BasicHiamActions
 {
     /**
      * @param AcceptanceTester $I
@@ -86,26 +86,10 @@ final class BasicActionsCest
 //        }
 //    }
 
-
-
-
     /**
-     * @param AcceptanceTester $I
-     * @throws \Exception
+     * @inheritDoc
      */
-    protected function login(AcceptanceTester $I): void
-    {
-        $info = $this->getUserInfo();
-
-        $loginPage = new Login($I);
-        $loginPage->tryFillContactInfo($info);
-        $loginPage->tryClickSubmitButton();
-    }
-
-    /**
-     * @return array
-     */
-    private function getUserInfo(): array
+    protected function getUserInfo(): array
     {
         return [
             'username' => 'hipanel_test_user',

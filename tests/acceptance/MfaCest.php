@@ -115,7 +115,7 @@ final class MfaCest extends BasicHiamActions
     }
 
     /**
-     * @return array
+     * @inheritDoc
      */
     protected function getUserInfo(): array
     {
