@@ -28,6 +28,24 @@ trait UserSessionTrait
     }
 
     /**
+     * @return array
+     */
+    protected function getAllSessions(): array
+    {
+        $directory = new \DirectoryIterator($this->sessionsPath);
+        $regex = new \RegexIterator($directory, '/^sess_.*$/', \RegexIterator::GET_MATCH);
+
+        $sessions = [];
+        foreach ($regex as $item) {
+            $sessionName = reset($item);
+            $sessionFile = file_get_contents($this->sessionsPath . '/' . $sessionName);
+            $sessions[$sessionName] = $this->sessionUnseriazlize($sessionFile);
+        }
+
+        return $sessions;
+    }
+
+    /**
      * @param string $session_data
      * @return array
      */

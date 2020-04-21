@@ -93,7 +93,8 @@ final class ChangeRoutineActionsCest extends BasicHiamActions
         $token = TokenHelper::findTokenByActionAndName($action, $user['username']);
         $I->assertNotEmpty($token, 'token exists');
 
-        codecept_debug($this->getUsersSession($I));
+        codecept_debug(['CURRENT_SESSION' => $this->getUsersSession($I)]);
+        codecept_debug(['ALL_SESSIONS' => $this->getAllSessions()]);
 
         $I->amOnPage("/site/$action?token=$token");
 
