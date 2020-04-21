@@ -17,18 +17,19 @@ trait UserSessionTrait
 
     /**
      * @param AcceptanceTester $I
-     * @return array
+     * @return array<string, array>
      */
     protected function getUsersSession(AcceptanceTester $I): array
     {
         $cookie = $I->grabCookie(ini_get('session.name'));
-        $sessionFile = file_get_contents($this->sessionsPath . '/sess_'.$cookie);
+        $sessionName = 'sess_' . $cookie;
+        $sessionFile = file_get_contents($this->sessionsPath . '/' . $sessionName);
 
-        return $this->sessionUnseriazlize($sessionFile);
+        return [$sessionName => $this->sessionUnseriazlize($sessionFile)];
     }
 
     /**
-     * @return array
+     * @return array<string, array>
      */
     protected function getAllSessions(): array
     {

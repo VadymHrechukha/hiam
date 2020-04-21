@@ -32,6 +32,7 @@ trait TotpHelper
         $worker = $totp->getWorker();
 
         $session = $this->getUsersSession($I);
+        $session = reset($session);
 
         return $worker->getCode($session[$module->paramPrefix . 'totp-tmp-secret'], time());
     }
