@@ -66,7 +66,10 @@ class SignUp extends AbstractHiamPage
         try {
             $I->clickWithLeftButton(['css' => 'label[for=\'i_agree_terms_and_privacy-email\']']);
         } catch (\Exception $e) {
+        }
+        try {
             $I->clickWithLeftButton(['css' => 'input[name*=i_agree_terms_and_privacy][type=checkbox]']);
+        } catch (\Exception $e) {
         }
     }
 }
