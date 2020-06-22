@@ -18,9 +18,9 @@ final class ControllerAccessCest extends BasicHiamActions
             'signup'            => 'Sign up',
             'login'             => 'Sign in',
             'restore-password'  => 'Forgot password',
-            'reset-password'    => 'Failed reset password',
-            'terms'             => 'Terms of Service Agreement',
-            'privacy-policy'    => 'PRIVACY POLICY',
+            'reset-password'    => 'Reset password',
+//            'terms'             => 'Terms of Service Agreement',
+//            'privacy-policy'    => 'PRIVACY POLICY',
         ];
         foreach ($actions as $action => $text) {
             $I->amOnPage('/site/' . $action);
@@ -68,17 +68,22 @@ final class ControllerAccessCest extends BasicHiamActions
     {
         $I->wantTo('check authenticated actions while authenticated');
         $usersInfo = $this->getUserInfo();
-        $actions = [
-            'lockscreen'                => $usersInfo['username'],
-            'resend-verification-email' => 'Please confirm your email address!',
-            'back'                      => $usersInfo['username'],
-            'change-password'           => 'Enter your new password',
-            'change-email'              => 'Enter your new email',
-        ];
 
-        foreach ($actions as $action => $text) {
+        foreach ([
+             'lockscreen'                => $usersInfo['username'],
+             'resend-verification-email' => 'Please confirm your email address!',
+             'back'                      => $usersInfo['username'],
+        ] as $action => $text) {
             $I->amOnPage('/site/' . $action);
             $I->waitForText($text);
+        }
+
+        foreach ([
+            'change-password'           => 'form[id=change-password-form]',
+            'change-email'              => 'form[id=change-email-form]',
+        ] as $action => $text) {
+            $I->amOnPage('/site/' . $action);
+            $I->waitForElement($text);
         }
     }
 
