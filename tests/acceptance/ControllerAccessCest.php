@@ -17,8 +17,8 @@ final class ControllerAccessCest extends BasicHiamActions
         $actions = [
             'signup'            => 'Sign up',
             'login'             => 'Sign in',
-            'restore-password'  => 'Forgot password',
-            'reset-password'    => 'Reset password',
+            'restore-password'  => 'Reset password',
+            'reset-password'    => 'Failed reset password',
 //            'terms'             => 'Terms of Service Agreement',
 //            'privacy-policy'    => 'PRIVACY POLICY',
         ];
