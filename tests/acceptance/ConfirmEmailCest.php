@@ -42,7 +42,7 @@ class ConfirmEmailCest extends BasicHiamActions
         $this->doEmailConfirmCheck($I, $user, 'confirm-sign-up-email');
 
         $lockscreen = new Lockscreen($I);
-        $I->see('Sign in to Advanced Hosting');
+        $I->see('Sign in');
     }
 
     /**
