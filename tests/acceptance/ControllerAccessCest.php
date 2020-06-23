@@ -14,17 +14,20 @@ final class ControllerAccessCest extends BasicHiamActions
     public function checkGuestActionsWhileGuest(AcceptanceTester $I): void
     {
         $I->wantTo('check guest actions while guest');
-        $actions = [
-            'signup'            => 'Sign up',
-            'login'             => 'Sign in',
-            'restore-password'  => 'Reset password',
-            'reset-password'    => 'Failed reset password',
-//            'terms'             => 'Terms of Service Agreement',
-//            'privacy-policy'    => 'PRIVACY POLICY',
-        ];
-        foreach ($actions as $action => $text) {
-            $I->amOnPage('/site/' . $action);
-            $I->waitForText($text);
+
+        try {
+            $this->checkTextOnPage($I, [
+                'signup'            => 'Sign up',
+                'login'             => 'Sign in',
+                'reset-password'    => 'Failed reset password',
+                'restore-password'  => 'Reset password',
+            ]);
+        } catch (\Exception $e) {
+            $this->checkTextOnPage($I, [
+                'restore-password'  => 'RESET PASSWORD',
+                'terms'             => 'Terms of Service Agreement',
+                'privacy-policy'    => 'PRIVACY POLICY',
+            ]);
         }
     }
 
@@ -69,20 +72,29 @@ final class ControllerAccessCest extends BasicHiamActions
         $I->wantTo('check authenticated actions while authenticated');
         $usersInfo = $this->getUserInfo();
 
-        foreach ([
+        $this->checkTextOnPage($I, [
              'lockscreen'                => $usersInfo['username'],
              'resend-verification-email' => 'Please confirm your email address!',
              'back'                      => $usersInfo['username'],
-        ] as $action => $text) {
-            $I->amOnPage('/site/' . $action);
-            $I->waitForText($text);
-        }
+        ]);
 
-        foreach ([
+        $this->checkElementOnPage($I, [
             'change-password'           => 'form[id=change-password-form]',
             'change-email'              => 'form[id=change-email-form]',
-        ] as $action => $text) {
-            $I->amOnPage('/site/' . $action);
+        ]);
+    }
+
+    private function checkTextOnPage(AcceptanceTester $I, array $data): void
+    {
+        foreach ($data as $page => $text) {
+            $I->amOnPage('/site/' . $page);
+            $I->waitForText($text);
+        }
+    }
+    private function checkElementOnPage(AcceptanceTester $I, array $data): void
+    {
+        foreach ($data as $page => $text) {
+            $I->amOnPage('/site/' . $page);
             $I->waitForElement($text);
         }
     }
