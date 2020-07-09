@@ -15,7 +15,10 @@ return [
             'messageClass' => \hiam\base\Message::class,
             'htmlLayout' => $params['user.seller'] && $params['user.htmlEmails']
                 ? "@{$params['user.seller']}/assets/mail/layout/html"
-                : '@hisite/views/layouts/mail-html',
+                : '@vendor/hiqdev/hisite/src/views/layouts/mail-html',
+            'textLayout' => $params['user.seller'] && $params['user.htmlEmails']
+                ? "@{$params['user.seller']}/assets/mail/layout/text"
+                : '@vendor/hiqdev/hisite/src/views/layouts/mail-text',
             'messageConfig' => [
                 'from' => [$params['supportEmail'] => $params['organization.name']],
             ],
