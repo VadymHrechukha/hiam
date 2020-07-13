@@ -50,14 +50,14 @@ return [
         ],
         'themeManager' => [
             'pathMap' => [
-                '$themedViewPaths' => ['@hiam/views'],
+                '$themedViewPaths' => [dirname(__DIR__) . '/src/views'],
             ],
         ],
         'i18n' => [
             'translations' => [
                 'hiam' => [
                     'class' => \yii\i18n\PhpMessageSource::class,
-                    'basePath' => '@hiam/messages',
+                    'basePath' => dirname(__DIR__) . '/src/messages',
                 ],
             ],
         ],
