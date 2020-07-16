@@ -13,6 +13,7 @@ return [
         'mailer' => array_filter([
             'useFileTransport' => false,
             'messageClass' => \hiam\base\Message::class,
+            'viewPath' => dirname(__DIR__) . '/src/views/mail',
             'htmlLayout' => $params['user.seller'] && $params['user.htmlEmails']
                 ? "@{$params['user.seller']}/assets/mail/layout/html"
                 : '@vendor/hiqdev/hisite/src/views/layouts/mail-html',
@@ -31,6 +32,9 @@ return [
     ],
     'container' => [
         'singletons' => [
+            \yii\mail\MailerInterface::class => function () {
+                return \hiqdev\yii\compat\yii::getApp()->get('mailer');
+            },
             \hiam\components\TokenRevokerInterface::class => \hiam\components\ActiveRecordTokenRevoker::class,
         ],
     ],
