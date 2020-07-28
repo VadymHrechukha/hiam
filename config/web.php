@@ -138,6 +138,7 @@ return [
             \hiam\components\OauthInterface::class => [
                 'class' => \hiam\components\Oauth::class,
             ],
+            \hiam\actions\ConfirmEmail::class => \hiam\actions\ConfirmEmail::class,
         ],
     ],
 ];

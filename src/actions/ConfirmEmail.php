@@ -55,17 +55,17 @@ class ConfirmEmail extends Action
     /**
      * @var ServiceInterface
      */
-    private $confirmator;
+    protected $confirmator;
 
     /**
      * @var User|\hiam\base\User
      */
-    private $user;
+    protected $user;
 
     /**
      * @var Session
      */
-    private $session;
+    protected $session;
 
     public function __construct($id, $controller, ServiceInterface $confirmator, User $user, Session $session, $config = [])
     {
