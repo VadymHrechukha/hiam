@@ -28,6 +28,7 @@ services:
     networks:
       - local-network
       - pgsql-network
+      - hiapi-network
     environment:
       - "ENV=${ENV}"
       - "PHP_IDE_CONFIG=serverName=${HOSTS}"
