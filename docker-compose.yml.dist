@@ -5,8 +5,6 @@ services:
     image: nginx:latest
     ports:
       - "80"
-    links:
-      - php-fpm
     networks:
       local-network:
       proxy-network:
@@ -30,10 +28,14 @@ services:
       - ./.docker/php/var/log/php:/var/log/php
       - var-volume:/HIAPI_VAR
     networks:
-      - hiapi-network
-      - local-network
+      hiapi-network:
+      local-network:
+        aliases:
+          - local-php-fpm
+      pgsql-network:
     environment:
       - "ENV=${ENV}"
+      - "PHP_IDE_CONFIG=serverName=${HOSTS}"
 
 networks:
   local-network:
@@ -43,7 +45,7 @@ networks:
       name: "${HIAPI_DIST}"
   pgsql-network:
     external:
-      name: "pgsql-${HIAPI_SITE}"
+      name: "pgsql-${HIAPI_DIST}"
   proxy-network:
     external:
       name: "nginx-proxy-network-${REAL_IP}"

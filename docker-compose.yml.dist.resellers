@@ -5,8 +5,6 @@ services:
     image: nginx:latest
     ports:
       - "80"
-    links:
-      - php-fpm
     networks:
       local-network:
       proxy-network:
@@ -21,6 +19,7 @@ services:
       - "VIRTUAL_HOST=${HOSTS}"
       - "LETSENCRYPT_HOST=${HOSTS}"
       - "LETSENCRYPT_EMAIL=devteam@hiqdev.com"
+      - "LETSENCRYPT_STANDALONE_CERTS=${LETSENCRYPT_STANDALONE_CERTS}"
 
   php-fpm:
     image: hiqdev/php:7.4-fpm
@@ -29,8 +28,10 @@ services:
       - ./.docker/php/var/log/php:/var/log/php
       - var-volume:/HIAPI_VAR
     networks:
-      - hiapi-network
-      - local-network
+      hiapi-network:
+      local-network:
+        aliases:
+          - local-php-fpm
     environment:
       - "ENV=${ENV}"
 
@@ -39,7 +40,7 @@ networks:
     driver: bridge
   hiapi-network:
     external:
-      name: "${HIAPI_SITE}"
+      name: "${HIAPI_DIST}"
   proxy-network:
     external:
       name: "nginx-proxy-network-${REAL_IP}"
@@ -47,4 +48,4 @@ networks:
 volumes:
   var-volume:
     external:
-      name: "var-${HIAPI_SITE}"
+      name: "var-${HIAPI_DIST}"
