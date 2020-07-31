@@ -41,7 +41,7 @@ networks:
     driver: bridge
   hiapi-network:
     external:
-      name: "${HIAPI_SITE}"
+      name: "${HIAPI_DIST}"
   pgsql-network:
     external:
       name: "pgsql-${HIAPI_DIST}"
