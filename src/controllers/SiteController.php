@@ -365,18 +365,14 @@ class SiteController extends \hisite\controllers\SiteController
 
     public function actionChangePassword()
     {
-        $model = Yii::createObject(['class' => ChangePasswordForm::class]);
-        $model->login = Yii::$app->user->identity->username;
+        $model = Yii::createObject(['class' => ChangePasswordForm::class], [$this->user->getIdentity()]);
 
         return $this->changeRoutine($model);
     }
 
     public function actionChangeEmail()
     {
-        $model = new ChangeEmailForm();
-        $identity = Yii::$app->user->identity;
-        $model->seller_id = $identity->seller_id;
-        $model->login = $identity->username;
+        $model = new ChangeEmailForm($this->user->getIdentity());
 
         return $this->changeRoutine($model);
     }
@@ -443,18 +439,17 @@ class SiteController extends \hisite\controllers\SiteController
             return $this->render($sender['view'], ['model' => $model]);
         }
 
-        if ($model->load($request->post()) && $model->validate()) {
-            if (($identity = $this->user->findIdentityByUsername($model->login)) !== null
-                && $model->applyTo($identity)
-                && $identity->save()
-            ) {
-                Yii::$app->session->setFlash('success', Yii::t('hiam', '{label} has been successfully changed', ['label' => $sender['label']]));
-                if ($model instanceof ChangeEmailForm) {
-                    $this->sendConfirmEmail($identity, 'confirm-email', $model->email);
-                }
-
-                return $this->redirect('transition');
+        if ($model->load($request->post())
+            && $model->validate()
+            && $model->apply()
+            && $model->save()
+        ) {
+            Yii::$app->session->setFlash('success', Yii::t('hiam', '{label} has been successfully changed', ['label' => $sender['label']]));
+            if ($model instanceof ChangeEmailForm) {
+                $this->sendConfirmEmail($this->user->getIdentity(), 'confirm-email', $model->email);
             }
+
+            return $this->redirect('transition');
         }
 
         $errors = implode("; \n", $model->getFirstErrors());

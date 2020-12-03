@@ -19,17 +19,22 @@ class ChangeEmailForm extends Model
     /**
      * @var string
      */
-    public $login;
-
-    /**
-     * @var integer
-     */
-    public $seller_id;
-
-    /**
-     * @var integer
-     */
     public $email;
+
+    private Identity $identity;
+
+    /**
+     * ChangeEmailForm constructor.
+     *
+     * @param Identity $identity the identity, email is being changed for
+     * @param array $config
+     */
+    public function __construct(Identity $identity, $config = [])
+    {
+        $this->identity = $identity;
+
+        parent::__construct($config);
+    }
 
     /**
      * {@inheritdoc}
@@ -37,19 +42,15 @@ class ChangeEmailForm extends Model
     public function rules(): array
     {
         return [
-            ['seller_id', 'integer'],
-            ['login', 'string'],
             ['email', 'email'],
-            [['login', 'seller_id', 'email'], 'required'],
+            [['email'], 'required'],
             [['email'], 'validateEmail'],
         ];
     }
 
     public function validateEmail($attribute, $params)
     {
-        /** @var Identity $identity */
-        $identity = Yii::$app->user->identityClass;
-        $existing = $identity::findOne(['username' => $this->{$attribute}]);
+        $existing = $this->identity::findOne(['username' => $this->{$attribute}]);
         if (!empty($existing)) {
             $this->addError($attribute, Yii::t('hiam', '{attribute} has already been taken',
                 [
@@ -71,8 +72,13 @@ class ChangeEmailForm extends Model
         ];
     }
 
-    public function applyTo(Identity $identity): bool
+    public function apply(): bool
     {
-        return $identity->setNewUnconfirmedEmail($this->email);
+        return $this->identity->setNewUnconfirmedEmail($this->email);
+    }
+
+    public function save(): bool
+    {
+        return $this->identity->save();
     }
 }

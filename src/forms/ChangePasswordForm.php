@@ -20,11 +20,6 @@ class ChangePasswordForm extends Model
     /**
      * @var string
      */
-    public $login;
-
-    /**
-     * @var string
-     */
     public $current_password;
 
     /**
@@ -37,18 +32,24 @@ class ChangePasswordForm extends Model
      */
     public $confirm_password;
 
-    /**
-     * @var PasswordValidatorInterface
-     */
-    private $passwordValidator;
+    private PasswordValidatorInterface $passwordValidator;
+    private Identity $identity;
 
     /**
+     * @param Identity $identity user's identity, who's password is being changed
+     * @param PasswordValidatorInterface $passwordValidator
      * @param array $config
      */
-    public function __construct(PasswordValidatorInterface $passwordValidator, $config = [])
+    public function __construct(Identity $identity, PasswordValidatorInterface $passwordValidator, $config = [])
     {
         parent::__construct($config);
+        $this->identity = $identity;
         $this->passwordValidator = $passwordValidator;
+    }
+
+    public function getLogin(): string
+    {
+        return $this->identity->getUsername();
     }
 
     /**
@@ -57,8 +58,8 @@ class ChangePasswordForm extends Model
     public function rules(): array
     {
         return [
-            [['login', 'current_password', 'new_password', 'confirm_password'], 'string'],
-            [['login', 'current_password', 'new_password', 'confirm_password'], 'required'],
+            [['current_password', 'new_password', 'confirm_password'], 'string'],
+            [['current_password', 'new_password', 'confirm_password'], 'required'],
             ['current_password', $this->passwordValidator->inlineFor($this)],
             ['confirm_password', 'compare', 'compareAttribute' => 'new_password'],
         ];
@@ -76,8 +77,13 @@ class ChangePasswordForm extends Model
         ];
     }
 
-    public function applyTo(Identity $identity): bool
+    public function apply(): bool
     {
-        return $identity->changePassword($this->new_password);
+        return $this->identity->changePassword($this->new_password);
+    }
+
+    public function save(): bool
+    {
+        return $this->identity->save();
     }
 }
