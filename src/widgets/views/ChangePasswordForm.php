@@ -9,8 +9,6 @@ use yii\widgets\ActiveForm;
 
     <?php $form = ActiveForm::begin(['id' => 'change-password-form']); ?>
 
-    <?= Html::activeHiddenInput($model, 'login') ?>
-
     <?= $form->field($model, 'current_password')->passwordInput(['autofocus' => true]) ?>
 
     <?= $form->field($model, 'new_password')->passwordInput() ?>

@@ -10,14 +10,16 @@
 
 namespace hiam\validators;
 
+use Closure;
 use yii\base\Model;
 
 interface InlineableValidatorInterface
 {
     /**
      * Provides inline validator closure for given model.
-     * @var Model $model
-     * @return function ($attribute, $params, $validator)
+     *
+     * @param Model $model
+     * @return Closure ($attribute, $params, $validator)
      */
-    public function inlineFor(Model $model): \Closure;
+    public function inlineFor(Model $model): Closure;
 }

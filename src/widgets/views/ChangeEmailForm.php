@@ -9,10 +9,6 @@ use yii\widgets\ActiveForm;
 
     <?php $form = ActiveForm::begin(['id' => 'change-email-form']); ?>
 
-    <?= Html::activeHiddenInput($model, 'login') ?>
-
-    <?= Html::activeHiddenInput($model, 'seller_id') ?>
-
     <?= $form->field($model, 'email')->input('email', ['autofocus' => true, 'placeholder' => Yii::t('hiam', 'Enter new email')]) ?>
 
     <div class="row">
