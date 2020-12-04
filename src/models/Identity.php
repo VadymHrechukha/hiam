@@ -102,7 +102,7 @@ class Identity extends ProxyModel implements MfaIdentityInterface, UserCredentia
     public static function findIdentity($username, $password = null)
     {
         $cond = ['username' => $username];
-        if ($password) {
+        if ($password !== null) {
             $cond['password'] = $password;
         }
 
