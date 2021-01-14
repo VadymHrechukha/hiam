@@ -73,7 +73,7 @@ class Identity extends ProxyModel implements MfaIdentityInterface, UserCredentia
     }
 
     /**
-     * This function is call from OAuth2 server implementation.
+     * This function is called from OAuth2 server implementation.
      * @param string $username
      * @return array|false user data array or false if not found
      */
