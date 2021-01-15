@@ -90,11 +90,21 @@ class User extends \yii\web\User
     /**
      * @return Identity|null
      */
-    public function findIdentity($id, $password = null)
+    public function findIdentity($id)
     {
         $class = $this->identityClass;
 
-        return $class::findIdentity($id, $password);
+        return $class::findIdentity($id);
+    }
+
+    /**
+     * @return Identity|null
+     */
+    public function findIdentityByCredentials($username, $password)
+    {
+        $class = $this->identityClass;
+
+        return $class::findIdentityByCredentials($username, $password);
     }
 
     /**

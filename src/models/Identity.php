@@ -72,9 +72,14 @@ class Identity extends ProxyModel implements MfaIdentityInterface, UserCredentia
         return $this->first_name . ' ' . $this->last_name;
     }
 
+    /**
+     * This function is called from OAuth2 server implementation.
+     * @param string $username
+     * @return array|false user data array or false if not found
+     */
     public function getUserDetails($username)
     {
-        $data = $this->findIdentity($username)->toArray();
+        $data = $this->findIdentityByUsername($username)->toArray();
         if (empty($data)) {
             return false;
         }
@@ -86,37 +91,43 @@ class Identity extends ProxyModel implements MfaIdentityInterface, UserCredentia
 
     public function checkUserCredentials($username, $password)
     {
-        $check = $this->findIdentity($username, $password);
+        $check = $this->findIdentityByCredentials($username, $password);
 
         return (bool) $check->id;
     }
 
     /**
      * Finds an identity by the given ID.
-     * @param string|integer $username ID or username or email to be looked for
-     * @param string $password when given the password is checked
-     * @return IdentityInterface the identity object that matches the given ID.
-     * Null should be returned if such an identity cannot be found
-     * or the identity is not in an active state (disabled, deleted, etc.)
+     * @param string|integer $id
+     * @return IdentityInterface|null the identity object that matches the given ID or null if not found
      */
-    public static function findIdentity($username, $password = null)
+    public static function findIdentity($id)
     {
-        $cond = ['username' => $username];
-        if ($password !== null) {
-            $cond['password'] = $password;
-        }
+        return static::findActive(['id' => $id]);
+    }
 
-        return static::findActive($cond);
+    /**
+     * Finds an identity by the given credentials.
+     * @param string $username
+     * @param string $password
+     * @return IdentityInterface|null the identity object that matches the given credentials.
+     */
+    public static function findIdentityByCredentials($username, $password)
+    {
+        return static::findActive([
+            'username' => $username,
+            'password' => $password,
+        ]);
     }
 
     public static function findIdentityByEmail($email)
     {
-        return static::findActive(compact('email'));
+        return static::findActive(['email' => $email]);
     }
 
     public static function findIdentityByUsername($username)
     {
-        return static::findActive(compact('username'));
+        return static::findActive(['username' => $username]);
     }
 
     /**
@@ -137,7 +148,7 @@ class Identity extends ProxyModel implements MfaIdentityInterface, UserCredentia
      */
     public static function findIdentityByAccessToken($access_token, $type = null)
     {
-        $token = OauthAccessTokens::findOne(compact('access_token'));
+        $token = OauthAccessTokens::findOne(['access_token' => $access_token]);
 
         return static::findIdentity($token->user_id);
     }
@@ -181,7 +192,7 @@ class Identity extends ProxyModel implements MfaIdentityInterface, UserCredentia
      */
     public function validatePassword($password)
     {
-        $model = static::findIdentity($this->username, $password);
+        $model = static::findIdentityByCredentials($this->username, $password);
 
         return (bool) $model->id;
     }

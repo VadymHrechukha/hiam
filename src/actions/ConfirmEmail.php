@@ -92,7 +92,7 @@ class ConfirmEmail extends Action
         /** @var Token $token */
         $token = $this->confirmator->findToken(Yii::$app->request->get('token'));
         if ($token && $token->check([$this->actionAttributeName => $this->actionAttributeValue])) {
-            $user = $this->user->findIdentity($token->get($this->usernameAttributeName));
+            $user = $this->user->findIdentityByUsername($token->get($this->usernameAttributeName));
         }
         if (!isset($user)) {
             $this->session->addFlash('error', $this->getErrorMessage());

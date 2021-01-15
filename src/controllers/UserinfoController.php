@@ -62,10 +62,7 @@ class UserinfoController extends Controller
             throw new ForbiddenHttpException(403);
         }
 
-        /** @var IdentityInterface $identityClass */
-        $identityClass = Yii::$app->user->identityClass;
-        $user = $identityClass::findIdentity($token->user_id);
-
+        $user = Yii::$app->user->findIdentity($token->user_id);
         $result = $this->getClaims($user, $token->scope ?? 'email');
         $result->sub = (string) $token->user_id;
 

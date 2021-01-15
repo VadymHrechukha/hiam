@@ -199,7 +199,7 @@ class SiteController extends \hisite\controllers\SiteController
         $model->username = $username;
         /** @noinspection NotOptimalIfConditionsInspection */
         if ($model->load(Yii::$app->request->post()) && $model->validate()) {
-            $identity = $this->user->findIdentity($model->username, $model->password);
+            $identity = $this->user->findIdentityByCredentials($model->username, $model->password);
             if ($identity && $this->login($identity, $model->remember_me)) {
                 return $this->goBack();
             }
@@ -393,7 +393,7 @@ class SiteController extends \hisite\controllers\SiteController
         }
 
         if ($model->load(Yii::$app->request->post()) && $model->validate()) {
-            $user = $this->user->findIdentity($token->get('username'));
+            $user = $this->user->findIdentityByUsername($token->get('username'));
             if (!$user) {
                 return false;
             }
