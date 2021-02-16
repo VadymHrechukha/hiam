@@ -11,7 +11,6 @@
 return [
     'components' => [
         'mailer' => array_filter([
-            'useFileTransport' => false,
             'messageClass' => \hiam\base\Message::class,
             'viewPath' => dirname(__DIR__) . '/src/views/mail',
             'htmlLayout' => $params['user.seller'] && $params['user.htmlEmails']
