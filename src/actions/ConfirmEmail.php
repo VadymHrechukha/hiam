@@ -10,6 +10,7 @@
 
 namespace hiam\actions;
 
+use hiam\event\BeforeEmailConfirmedEvent;
 use hiqdev\php\confirmator\ServiceInterface;
 use hiqdev\php\confirmator\Token;
 use Yii;
@@ -25,6 +26,8 @@ use yii\web\User;
  */
 class ConfirmEmail extends Action
 {
+    const EVENT_BEFORE_EMAIL_CONFIRMED = 'beforeEmailConfirmed';
+
     const SESSION_VAR_NAME = 'confirming_email';
 
     /**
@@ -97,7 +100,9 @@ class ConfirmEmail extends Action
         if (!isset($user)) {
             $this->session->addFlash('error', $this->getErrorMessage());
         } else {
-            $user->setConfirmedEmail($token->get('email'));
+            $newEmail = $token->get('email');
+            $this->trigger(self::EVENT_BEFORE_EMAIL_CONFIRMED, new BeforeEmailConfirmedEvent(['newEmail' => $newEmail]));
+            $user->setConfirmedEmail($newEmail);
             $token->remove();
             $this->session->addFlash('success', $this->getSuccessMessage());
             if ($user->email === $this->session->get(static::SESSION_VAR_NAME)) {
