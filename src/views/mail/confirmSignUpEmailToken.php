@@ -17,7 +17,7 @@ $message->renderTextBody(basename(__FILE__, '.php') . '-text', compact('user', '
 
 ?>
 <div class="password-reset">
-    <p><?= Yii::t('hiam', 'Hello {name},', ['name' => Html::encode($user->name)]) ?></p>
+    <p><?= Yii::t('hiam', 'Hello {name},', ['name' => Html::encode($user->username)]) ?></p>
 
     <p><?= Yii::t('hiam', 'Follow the link below to confirm your email:') ?></p>
 

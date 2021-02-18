@@ -6,7 +6,7 @@
 /** @var hiqdev\php\confirmator\Token $token */
 
 ?>
-<?= Yii::t('hiam', 'Hello {name},', ['name' => $user->name]) ?>
+<?= Yii::t('hiam', 'Hello {name},', ['name' => $user->username]) ?>
 
 <?= Yii::t('hiam', 'Follow the link below to confirm your email:') ?>
 
