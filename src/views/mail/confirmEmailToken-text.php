@@ -3,9 +3,15 @@
 /** @var yii\web\View $this */
 /** @var yii\web\IdentityInterface $user */
 /** @var string $confirmLink */
+/** @var hiqdev\php\confirmator\Token $token */
+
 ?>
 <?= Yii::t('hiam', 'Hello {name},', ['name' => $user->username]) ?>
 
 <?= Yii::t('hiam', 'Follow the link below to confirm your email:') ?>
 
 <?= $confirmLink ?>
+<?php if (!empty($token->get('notAfter'))) : ?>
+
+<?= Yii::t('hiam', 'Attention! The link is valid until {date} UTC', ['date' => $token->get('notAfter')]) ?>
+<?php endif ?>

@@ -78,4 +78,5 @@ return [
     'Last name' => 'Фамилия',
     'Last name: {last_name}' => 'Фамилия: {last_name}',
     'IP: {ip}' =>  'IP: {ip}',
+    'Attention! The link is valid until {date} UTC' => 'Внимание! Ссылка действительна до {date} UTC',
 ];
