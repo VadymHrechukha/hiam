@@ -101,7 +101,10 @@ class ConfirmEmail extends Action
             $this->session->addFlash('error', $this->getErrorMessage());
         } else {
             $newEmail = $token->get('email');
-            $this->trigger(self::EVENT_BEFORE_EMAIL_CONFIRMED, new BeforeEmailConfirmedEvent(['newEmail' => $newEmail]));
+            $this->trigger(self::EVENT_BEFORE_EMAIL_CONFIRMED, new BeforeEmailConfirmedEvent([
+                'user' => $user,
+                'newEmail' => $newEmail
+            ]));
             $user->setConfirmedEmail($newEmail);
             $token->remove();
             $this->session->addFlash('success', $this->getSuccessMessage());
