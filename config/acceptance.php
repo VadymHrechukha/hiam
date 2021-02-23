@@ -15,7 +15,7 @@ return [
     'COMMON_TESTS_LOCATION' => dirname(__DIR__, 4) . '/tests',
     'COMMON_ACCEPTANCE_SUITE' => dirname(__DIR__, 4) . '/tests/acceptance.suite.yml',
 
-    'URL' => $params['url'] ?? null,
+    'URL' => getenv('URL'),
     'BROWSER' => 'chrome',
-    'SELENIUM_HOST' => $params['tests.acceptance.selenium.host'] ?? null,
+    'SELENIUM_HOST' => getenv('TESTS_ACCEPTANCE_SELENIUM_HOST'),
 ];
