@@ -30,6 +30,7 @@ use hisite\actions\RedirectAction;
 use hisite\actions\RenderAction;
 use hisite\actions\ValidateAction;
 use vintage\recaptcha\helpers\RecaptchaConfig;
+use vintage\recaptcha\validators\InvisibleRecaptchaValidator;
 use Yii;
 use yii\authclient\AuthAction;
 use yii\authclient\ClientInterface;
@@ -197,8 +198,10 @@ class SiteController extends \hisite\controllers\SiteController
     protected function doLogin($model, $view, $username = null)
     {
         $model->username = $username;
+        $isCaptchaRequired = $this->isCaptchaRequired();
+
         /** @noinspection NotOptimalIfConditionsInspection */
-        if ($model->load(Yii::$app->request->post()) && $model->validate()) {
+        if ($model->load(Yii::$app->request->post()) && $model->validate() && $this->isCaptchaChecked($isCaptchaRequired)) {
             $identity = $this->user->findIdentityByCredentials($model->username, $model->password);
             if ($identity && $this->login($identity, $model->remember_me)) {
                 return $this->goBack();
@@ -208,8 +211,6 @@ class SiteController extends \hisite\controllers\SiteController
             $model->addError('password', Yii::t('hiam', 'Incorrect password.'));
             $model->password = null;
         }
-
-        $isCaptchaRequired = $this->isCaptchaRequired();
 
         return $this->render($view, compact('model', 'isCaptchaRequired'));
     }
@@ -288,7 +289,9 @@ class SiteController extends \hisite\controllers\SiteController
         $client = Yii::$app->authClientCollection->getActiveClient();
 
         $model = new SignupForm(compact('scenario'));
-        if ($model->load(Yii::$app->request->post()) && $model->validate()) {
+        $isCaptchaRequired = $this->isCaptchaRequired();
+
+        if ($model->load(Yii::$app->request->post()) && $model->validate() && $this->isCaptchaChecked($isCaptchaRequired)) {
             if ($user = $this->user->signup($model)) {
                 if ($client) {
                     $this->user->setRemoteUser($client, $user);
@@ -310,7 +313,6 @@ class SiteController extends \hisite\controllers\SiteController
                 $model->email = $username;
             }
         }
-        $isCaptchaRequired = $this->isCaptchaRequired();
 
         return $this->render('signup', compact('model', 'isCaptchaRequired'));
     }
@@ -323,9 +325,11 @@ class SiteController extends \hisite\controllers\SiteController
             return $this->redirect(['login']);
         }
 
+
+        $isCaptchaRequired = $this->isCaptchaRequired();
         $model = new RestorePasswordForm();
         $model->username = $username;
-        if ($model->load(Yii::$app->request->post()) && $model->validate()) {
+        if ($model->load(Yii::$app->request->post()) && $model->validate() && $this->isCaptchaChecked($isCaptchaRequired)) {
             $user = $this->user->findIdentityByUsername($model->username);
             if ($this->confirmator->mailToken($user, 'restore-password')) {
                 Yii::$app->session->setFlash('success',
@@ -333,14 +337,14 @@ class SiteController extends \hisite\controllers\SiteController
                         'maskedMail' => $model->maskEmail($user->email),
                     ])
                 );
-            } else {
+            } else if ($this->isCaptchaChecked($isCaptchaRequired)) {
                 Yii::$app->session->setFlash('error', Yii::t('hiam', 'Sorry, we are unable to reset password for the provided username or email. Try to contact support team.'));
+            } else {
+                 Yii::$app->session->setFlash('error', Yii::t('hiam', 'Failed check captcha.'));
             }
 
             return $this->redirect('login');
         }
-
-        $isCaptchaRequired = $this->isCaptchaRequired();
 
         return $this->render('restorePassword', compact('model', 'isCaptchaRequired'));
     }
@@ -506,5 +510,20 @@ class SiteController extends \hisite\controllers\SiteController
         } else {
             Yii::error('Failed to send email confirmation letter', __METHOD__);
         }
+    }
+
+    private function isCaptchaChecked(bool $isCaptchaRequired = false) : bool
+    {
+        if ($isCaptchaRequired !== true) {
+            return true;
+        }
+
+        try {
+            $isChecked = InvisibleRecaptchaValidator::validateInline(Yii::$app->request->post(), Yii::$app->request->userIP);
+        } catch (\yii\base\InvalidConfigException $e) {
+            return false;
+        }
+
+        return $isChecked;
     }
 }
