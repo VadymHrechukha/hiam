@@ -44,6 +44,7 @@ class Identity extends ProxyModel implements MfaIdentityInterface, UserCredentia
 
     public $allowed_ips;
     public $totp_secret;
+    public $tmp_totp_secret;
 
     /**
      * {@inheritdoc}
@@ -61,7 +62,7 @@ class Identity extends ProxyModel implements MfaIdentityInterface, UserCredentia
             [['type', 'state'], 'string', 'min' => 2, 'max' => 10],
 
             ['allowed_ips',     'string'],
-            ['totp_secret',     'string'],
+            [['totp_secret', 'tmp_totp_secret'],     'string'],
 
             ['password_hash',        'string'],
         ];
@@ -276,6 +277,18 @@ class Identity extends ProxyModel implements MfaIdentityInterface, UserCredentia
     public function addAllowedIp(string $allowedIp): MfaIdentityInterface
     {
         $this->allowed_ips .= ($this->getAllowedIps() ? ',' : '') . $allowedIp;
+
+        return $this;
+    }
+
+    public function getTemporarySecret(): ?string
+    {
+        return $this->tmp_totp_secret;
+    }
+
+    public function setTemporarySecret(?string $secret): MfaIdentityInterface
+    {
+        $this->tmp_totp_secret = $secret;
 
         return $this;
     }
