@@ -15,6 +15,7 @@ use hiam\forms\ChangePasswordForm;
 use hiam\models\Identity;
 use Yii;
 use yii\authclient\ClientInterface;
+use yii\base\InvalidConfigException;
 use yii\web\IdentityInterface;
 use yii\web\Session;
 
