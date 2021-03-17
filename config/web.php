@@ -91,7 +91,7 @@ return [
                     'class' => \OAuth2\GrantType\AuthorizationCode::class,
                 ],
                 'user_credentials' => [
-                    'class' => \hiqdev\yii2\mfa\GrandType\UserCredentials::class,
+                    'class' => \hiqdev\yii2\mfa\GrantType\UserCredentials::class,
                 ],
                 'refresh_token' => [
                     'class' => \OAuth2\GrantType\RefreshToken::class,
