@@ -12,6 +12,7 @@ namespace hiam\models;
 
 use filsh\yii2\oauth2server\models\OauthAccessTokens;
 use hiam\components\AuthKeyGenerator;
+use hiqdev\yii2\mfa\base\ApiMfaIdentityInterface;
 use hiqdev\yii2\mfa\base\MfaIdentityInterface;
 use OAuth2\Storage\UserCredentialsInterface;
 use Yii;
@@ -30,7 +31,9 @@ use yii\web\IdentityInterface;
  * @property string $last_name
  * @property string $first_name
  */
-class Identity extends ProxyModel implements MfaIdentityInterface, UserCredentialsInterface
+class Identity
+    extends ProxyModel
+    implements MfaIdentityInterface, ApiMfaIdentityInterface, UserCredentialsInterface
 {
     public $id;
     public $type;
@@ -264,7 +267,7 @@ class Identity extends ProxyModel implements MfaIdentityInterface, UserCredentia
     /**
      * @inheritDoc
      */
-    public function setTotpSecret(string $secret): MfaIdentityInterface
+    public function setTotpSecret(string $secret)
     {
         $this->totp_secret = $secret;
 
@@ -274,7 +277,7 @@ class Identity extends ProxyModel implements MfaIdentityInterface, UserCredentia
     /**
      * @inheritDoc
      */
-    public function addAllowedIp(string $allowedIp): MfaIdentityInterface
+    public function addAllowedIp(string $allowedIp)
     {
         $this->allowed_ips .= ($this->getAllowedIps() ? ',' : '') . $allowedIp;
 
@@ -286,7 +289,7 @@ class Identity extends ProxyModel implements MfaIdentityInterface, UserCredentia
         return $this->tmp_totp_secret;
     }
 
-    public function setTemporarySecret(?string $secret): MfaIdentityInterface
+    public function setTemporarySecret(?string $secret)
     {
         $this->tmp_totp_secret = $secret;
 
