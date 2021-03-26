@@ -37,7 +37,7 @@ abstract class ProxyModel extends \yii\base\Model
         return $model;
     }
 
-    public function save()
+    public function save(): bool
     {
         $this->trigger(static::EVENT_BEFORE_SAVE);
         $class = static::getStorageClass();

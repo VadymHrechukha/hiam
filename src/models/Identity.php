@@ -31,9 +31,10 @@ use yii\web\IdentityInterface;
  * @property string $last_name
  * @property string $first_name
  */
-class Identity
-    extends ProxyModel
-    implements MfaIdentityInterface, ApiMfaIdentityInterface, UserCredentialsInterface
+class Identity extends ProxyModel implements
+    MfaIdentityInterface,
+    ApiMfaIdentityInterface,
+    UserCredentialsInterface
 {
     public $id;
     public $type;
@@ -267,21 +268,17 @@ class Identity
     /**
      * @inheritDoc
      */
-    public function setTotpSecret(string $secret)
+    public function setTotpSecret(string $secret): void
     {
         $this->totp_secret = $secret;
-
-        return $this;
     }
 
     /**
      * @inheritDoc
      */
-    public function addAllowedIp(string $allowedIp)
+    public function addAllowedIp(string $allowedIp): void
     {
         $this->allowed_ips .= ($this->getAllowedIps() ? ',' : '') . $allowedIp;
-
-        return $this;
     }
 
     public function getTemporarySecret(): ?string
@@ -289,10 +286,8 @@ class Identity
         return $this->tmp_totp_secret;
     }
 
-    public function setTemporarySecret(?string $secret)
+    public function setTemporarySecret(?string $secret): void
     {
         $this->tmp_totp_secret = $secret;
-
-        return $this;
     }
 }
