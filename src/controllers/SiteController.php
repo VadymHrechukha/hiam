@@ -492,7 +492,7 @@ class SiteController extends \hisite\controllers\SiteController
         }
         if (Yii::$app->session->hasFlash('success')) {
             $separator = strpos($response->headers['location'], '?') ? '&' : '?';
-            $response->headers['location'] .= $separator . 'success=true';
+            $response->getHeaders()->add('Location', $separator . 'success=true');
         }
     }
 
