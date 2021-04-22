@@ -11,6 +11,8 @@
 namespace hiam\behaviors;
 
 use hiam\components\OauthInterface;
+use hiam\providers\ReturnUrlsProviderInterface;
+use hiam\validators\BackUrlValidatorInterface;
 use Yii;
 use yii\base\Application;
 use yii\base\Event;
@@ -30,15 +32,15 @@ use yii\base\Event;
  */
 class SaveReturnUrl extends \yii\base\Behavior
 {
-    /**
-     * @var OauthInterface
-     */
-    private $oauth;
+    private OauthInterface $oauth;
+    private BackUrlValidatorInterface $backUrlValidator;
 
-    public function __construct(OauthInterface $oauth, $config = [])
+    public function __construct(OauthInterface $oauth, BackUrlValidatorInterface $backUrlValidator, $config = [])
     {
-        $this->oauth = $oauth;
         parent::__construct($config);
+
+        $this->oauth = $oauth;
+        $this->backUrlValidator = $backUrlValidator;
     }
 
     public function events()
@@ -60,7 +62,7 @@ class SaveReturnUrl extends \yii\base\Behavior
         }
 
         $back = $request->post('back') ?? $request->get('back') ?? null;
-        if ($back) {
+        if ($back && $this->backUrlValidator->validate($back)) {
             $this->oauth->cleanAuthorizeRequest();
             Yii::$app->user->setReturnUrl($back);
         }
