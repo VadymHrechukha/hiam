@@ -207,6 +207,7 @@ class User extends \yii\web\User
             return false;
         }
         $class = $this->getStorageClass('identity');
+        /** @var \hiam\mrdp\storage\Client $user */
         $user = $class::find()->whereId(Yii::$app->user->id)->one();
 
         return $user->updateEmail($model->email);
