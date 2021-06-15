@@ -61,6 +61,8 @@
         "hiqdev/yii2-language": "dev-master",
         "hiqdev/yii2-hiam-authclient": "dev-master",
         "hiqdev/yii2-monitoring": "dev-master",
+        "hiqdev/yii-compat": "dev-master",
+        "hiqdev/hipanel-rbac": "dev-master",
         "hiqdev/hisite": "dev-master",
         "sentry/sdk": "^2.1",
         "vintage/yii2-invisible-recaptcha": "dev-master"
