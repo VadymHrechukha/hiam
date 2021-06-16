@@ -472,7 +472,8 @@ class SiteController extends \hisite\controllers\SiteController
 
     public function actionBack()
     {
-        return $this->goBack(Yii::$app->params['site_url']);
+        $hisiteUrl = isset(Yii::$app->params['hipanel.site']) ? ("https://" . Yii::$app->params['hipanel.site']) : null;
+        return $this->goBack(Yii::$app->params['site_url'] ?? $hisiteUrl);
     }
 
     public function goBack($defaultUrl = null)
