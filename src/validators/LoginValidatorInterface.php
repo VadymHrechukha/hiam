@@ -10,6 +10,6 @@
 
 namespace hiam\validators;
 
-interface LoginValidatorInterface extends InlineableValidatorInterface
+interface LoginValidatorInterface
 {
 }

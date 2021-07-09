@@ -16,6 +16,7 @@ use hiam\base\User;
 use hiam\behaviors\CaptchaBehavior;
 use hiam\behaviors\RevokeOauthTokens;
 use hiam\components\OauthInterface;
+use hiam\components\Request;
 use hiam\forms\ChangeEmailForm;
 use hiam\forms\ChangePasswordForm;
 use hiam\forms\ConfirmPasswordForm;
@@ -23,19 +24,17 @@ use hiam\forms\LoginForm;
 use hiam\forms\ResetPasswordForm;
 use hiam\forms\RestorePasswordForm;
 use hiam\forms\SignupForm;
-use hiam\models\Identity;
-use hiqdev\php\confirmator\ServiceInterface;
+use hiqdev\yii2\confirmator\Service;
 use hiqdev\yii2\mfa\filters\ValidateAuthenticationFilter;
 use hisite\actions\RedirectAction;
 use hisite\actions\RenderAction;
 use hisite\actions\ValidateAction;
 use vintage\recaptcha\helpers\RecaptchaConfig;
-use vintage\recaptcha\validators\InvisibleRecaptchaValidator;
 use Yii;
 use yii\authclient\AuthAction;
 use yii\authclient\ClientInterface;
+use yii\base\Model;
 use yii\filters\AccessControl;
-use yii\web\Response;
 
 /**
  * Site controller.
@@ -44,20 +43,10 @@ use yii\web\Response;
  */
 class SiteController extends \hisite\controllers\SiteController
 {
-    /**
-     * @inheritdoc
-     */
     public $defaultAction = 'lockscreen';
 
-    /**
-     * @var ServiceInterface
-     */
-    private $confirmator;
-
-    /**
-     * @var OauthInterface
-     */
-    private $oauth;
+    private Service $confirmator;
+    private OauthInterface $oauth;
 
     // XXX Disabled CSRF to allow external links to resend confirmation, change email/password...
     // XXX TO BE FIXED
@@ -65,12 +54,10 @@ class SiteController extends \hisite\controllers\SiteController
 
     /**
      * Identifier which shows success login state to be used in CaptchaBehavior.
-     *
-     * @var bool $actionSubmitOccurred
      */
     private $actionSubmitOccurred = false;
 
-    public function __construct($id, $module, ServiceInterface $confirmator, OauthInterface $oauth, $config = [])
+    public function __construct($id, $module, Service $confirmator, OauthInterface $oauth, $config = [])
     {
         parent::__construct($id, $module, $config = []);
 
@@ -192,42 +179,32 @@ class SiteController extends \hisite\controllers\SiteController
             return $this->redirect(['remote-proceed']);
         }
 
-        return $this->doLogin(Yii::createObject(['class' => LoginForm::class]), 'login', $username);
+        return $this->doLogin(new LoginForm(), 'login', $username);
     }
 
     protected function doLogin($model, $view, $username = null)
     {
+        /** @var Request $request */
+        $request = Yii::$app->request;
         $model->username = $username;
-        $isCaptchaRequired = $this->isCaptchaRequired();
+        $isCaptchaRequired = $request->isCaptchaRequired();
 
         /** @noinspection NotOptimalIfConditionsInspection */
-        if ($model->load(Yii::$app->request->post()) && $model->validate() && $this->isCaptchaChecked($isCaptchaRequired)) {
+        if ($model->load($request->post()) && $model->validate() && $request->validateCaptcha()) {
             $identity = $this->user->findIdentityByCredentials($model->username, $model->password);
-            if ($identity && $this->login($identity, $model->remember_me)) {
-                return $this->goBack();
+            $returnUrl = $this->user->getReturnUrl();
+            $this->user->login($identity, $model->remember_me ? null : 0);
+            if ($this->user->getReturnUrl() !== '/') {
+                $this->user->setReturnUrl($returnUrl);
             }
+            return $this->goBack();
+        } else {
             $this->actionSubmitOccurred = true;
-
-            $model->addError('password', Yii::t('hiam', 'Incorrect password.'));
-            $model->password = null;
         }
+
+        $model->password = null;
 
         return $this->render($view, compact('model', 'isCaptchaRequired'));
-    }
-
-    /**
-     * Logs user in and preserves return URL.
-     */
-    private function login(Identity $identity, $sessionDuration = 0): bool
-    {
-        $returnUrl = $this->user->getReturnUrl();
-
-        $result = $this->user->login($identity, $sessionDuration ? null : 0);
-        if ($result && $returnUrl && $returnUrl !== '/') {
-            $this->user->setReturnUrl($returnUrl);
-        }
-
-        return $result;
     }
 
     public function actionConfirmPassword()
@@ -288,18 +265,22 @@ class SiteController extends \hisite\controllers\SiteController
 
         $client = Yii::$app->authClientCollection->getActiveClient();
 
+        /** @var Request $request */
+        $request = Yii::$app->request;
         $model = new SignupForm(compact('scenario'));
-        $isCaptchaRequired = $this->isCaptchaRequired();
 
-        if ($model->load(Yii::$app->request->post()) && $model->validate() && $this->isCaptchaChecked($isCaptchaRequired)) {
-            if ($user = $this->user->signup($model)) {
-                if ($client) {
-                    $this->user->setRemoteUser($client, $user);
-                }
-                $this->sendConfirmEmail($user, 'confirm-sign-up-email');
+        $isCaptchaRequired = $request->isCaptchaRequired();
 
-                return $this->redirect('transition');
+        if ($model->load($request->post()) && $model->validate() && $request->validateCaptcha()) {
+            $identity = $this->user->signup($model);
+            $this->confirmator->mailToken($identity, 'confirm-sign-up-email');
+            $this->user->login($identity);
+
+            if ($client) {
+                $this->user->setRemoteUser($client, $identity);
             }
+
+            return $this->redirect('transition');
         } else {
             if ($client) {
                 try {
@@ -325,23 +306,16 @@ class SiteController extends \hisite\controllers\SiteController
             return $this->redirect(['login']);
         }
 
-
-        $isCaptchaRequired = $this->isCaptchaRequired();
+        /** @var Request $request */
+        $request = Yii::$app->request;
+        $isCaptchaRequired = $request->isCaptchaRequired();
         $model = new RestorePasswordForm();
         $model->username = $username;
-        if ($model->load(Yii::$app->request->post()) && $model->validate() && $this->isCaptchaChecked($isCaptchaRequired)) {
-            $user = $this->user->findIdentityByUsername($model->username);
-            if ($this->confirmator->mailToken($user, 'restore-password')) {
-                Yii::$app->session->setFlash('success',
-                    Yii::t('hiam', 'Check your email {maskedMail} for further instructions.', [
-                        'maskedMail' => $model->maskEmail($user->email),
-                    ])
-                );
-            } else if ($this->isCaptchaChecked($isCaptchaRequired)) {
-                Yii::$app->session->setFlash('error', Yii::t('hiam', 'Sorry, we are unable to reset password for the provided username or email. Try to contact support team.'));
-            } else {
-                 Yii::$app->session->setFlash('error', Yii::t('hiam', 'Failed check captcha.'));
-            }
+        if ($model->load($request->post()) && $model->validate() && $request->validateCaptcha()) {
+            $this->confirmator->mailToken(
+                $this->user->findIdentityByUsername($model->username),
+                'restore-password',
+            );
 
             return $this->redirect('login');
         }
@@ -352,16 +326,21 @@ class SiteController extends \hisite\controllers\SiteController
     public function actionResetPassword($token = null)
     {
         $model = new ResetPasswordForm();
-        $reset = $this->resetPassword($model, $token);
 
-        if (isset($reset)) {
-            if ($reset) {
-                Yii::$app->session->setFlash('success', Yii::t('hiam', 'New password was saved.'));
-            } else {
-                Yii::$app->session->setFlash('error', Yii::t('hiam', 'Failed reset password. Please start over.'));
-            }
+        $token = $this->confirmator->findToken($token);
 
-            return $this->redirect('login');
+        if (
+            $token
+            && $token->check(['action' => 'restore-password'])
+            && $model->load(Yii::$app->request->post())
+            && $model->validate()
+        ) {
+            $user = $this->user->findIdentityByUsername($token->get('username'));
+            $user->password = $model->password;
+            $user->save();
+            $token->remove();
+
+            Yii::$app->session->setFlash('success', Yii::t('hiam', 'New password was saved.'));
         }
 
         return $this->render('resetPassword', compact('model', 'token'));
@@ -369,162 +348,83 @@ class SiteController extends \hisite\controllers\SiteController
 
     public function actionChangePassword()
     {
-        $model = Yii::createObject(['class' => ChangePasswordForm::class], [$this->user->getIdentity()]);
-
-        return $this->changeRoutine($model);
+        return $this->changeRoutine(
+            new ChangePasswordForm($this->user->getIdentity()),
+            'change-password',
+            Yii::t('hiam', 'Password')
+        );
     }
 
     public function actionChangeEmail()
     {
-        $model = new ChangeEmailForm($this->user->getIdentity());
-
-        return $this->changeRoutine($model);
-    }
-
-    public function actionResendVerificationEmail()
-    {
-        $user = $this->user->getIdentity();
-        $this->sendConfirmEmail($user, 'confirm-sign-up-email');
-
-        return $this->goBack();
-    }
-
-    public function resetPassword($model, $token)
-    {
-        $token = $this->confirmator->findToken($token);
-        if (!$token || !$token->check(['action' => 'restore-password'])) {
-            return false;
-        }
-
-        if ($model->load(Yii::$app->request->post()) && $model->validate()) {
-            $user = $this->user->findIdentityByUsername($token->get('username'));
-            if (!$user) {
-                return false;
-            }
-            $user->password = $model->password;
-            $res = $user->save();
-            if ($res) {
-                $token->remove();
-            }
-
-            return $res;
-        }
-
-        return null;
-    }
-
-    /**
-     * @throws \yii\base\InvalidConfigException
-     */
-    private function isCaptchaRequired(): bool
-    {
-        return (Yii::$app->request->getBodyParams()['captchaIsRequired'] ?? false) && (YII_ENV !== 'test');
+        return $this->changeRoutine(
+            new ChangeEmailForm($this->user->getIdentity()),
+            'change-email',
+            Yii::t('hiam', 'Email'),
+        );
     }
 
     /**
      * @param ChangePasswordForm|ChangeEmailForm $model
      */
-    private function changeRoutine($model)
+    private function changeRoutine(Model $model, string $view, string $label)
     {
-        $map = [
-            ChangePasswordForm::class => [
-                'view' => 'change-password',
-                'label' => Yii::t('hiam', 'Password'),
-            ],
-            ChangeEmailForm::class => [
-                'view' => 'change-email',
-                'label' => Yii::t('hiam', 'Email'),
-            ],
-        ];
-        $sender = $map[get_class($model)];
-        $request = Yii::$app->request;
-
-        if (!$request->isPost) {
-            return $this->render($sender['view'], ['model' => $model]);
-        }
-
-        if ($model->load($request->post())
+        if (Yii::$app->request->isPost
+            && $model->load(Yii::$app->request->post())
             && $model->validate()
             && $model->apply()
             && $model->save()
         ) {
-            Yii::$app->session->setFlash('success', Yii::t('hiam', '{label} has been successfully changed', ['label' => $sender['label']]));
+            Yii::$app->session->setFlash(
+                'success',
+                Yii::t('hiam', '{label} has been successfully changed', ['label' => $label])
+            );
             if ($model instanceof ChangeEmailForm) {
-                $this->sendConfirmEmail($this->user->getIdentity(), 'confirm-email', $model->email);
+                $this->confirmator->mailToken(
+                    $this->user->getIdentity(),
+                    'confirm-email',
+                    ['email' => $this->user->getIdentity()->email_new]
+                );
+                $this->confirmator->mailToken(
+                    $this->user->getIdentity(),
+                    'confirm-email',
+                    [
+                        'email' => $this->user->getIdentity()->email_new,
+                        'to' => $this->user->getIdentity()->email_new,
+                    ]
+                );
             }
 
             return $this->redirect('transition');
         }
 
-        $errors = implode("; \n", $model->getFirstErrors());
-        if (!$errors) {
-            $errors = Yii::t('hiam', '{label} has not been changed: {message}',
-                [
-                    'label' => $sender['label'],
-                    'message' => $errors,
-                ]
-            );
-        }
-        Yii::$app->session->setFlash('error', $errors);
+        return $this->render($view, ['model' => $model]);
+    }
 
-        return $this->render($sender['view'], ['model' => $model]);
+    public function actionResendVerificationEmail()
+    {
+        $user = $this->user->getIdentity();
+        $action = empty($user->email_confirmed) ? 'confirm-sign-up-email' : 'confirm-email';
+        $this->confirmator->mailToken($user, $action, ['email' => $user->email_new]);
+        $this->confirmator->mailToken($user, $action, ['email' => $user->email_new, 'to' => $user->email_new]);
+
+        return $this->goBack();
     }
 
     public function actionBack()
     {
-        $hisiteUrl = isset(Yii::$app->params['hipanel.site']) ? ("https://" . Yii::$app->params['hipanel.site']) : null;
-        return $this->goBack(Yii::$app->params['site_url'] ?? $hisiteUrl);
+        return $this->goBack(Yii::$app->params['site_url'] ?? Yii::getAlias('@HIPANEL_SITE', false));
     }
 
     public function goBack($defaultUrl = null)
     {
         $response = $this->oauth->goBack() ?? parent::goBack($defaultUrl);
-        $this->addSuccessParamToResponseUrl($response);
-        return $response;
-    }
 
-    /**
-     * @param Response|string|null $response
-     */
-    private function addSuccessParamToResponseUrl($response)
-    {
-        if (empty($response)) {
-            return;
-        }
         if (Yii::$app->session->hasFlash('success')) {
             $separator = strpos($response->headers['location'], '?') ? '&' : '?';
             $response->getHeaders()->add('Location', $separator . 'success=true');
         }
-    }
 
-    protected function sendConfirmEmail($user, $action, $newEmail = null)
-    {
-        if ($this->confirmator->mailToken($user, $action, ['email' => $newEmail ?? $user->email])) {
-            Yii::$app->session->setFlash('warning',
-                Yii::t('hiam', 'Please confirm your email address!') . '<br/>' .
-                Yii::t('hiam',
-                    'An email with confirmation instructions was sent to <b>{email}</b>',
-                    ['email' => $user->email_confirmed ?? $user->email]
-                )
-            );
-            Yii::$app->session->set(ConfirmEmail::SESSION_VAR_NAME, $user->email);
-        } else {
-            Yii::error('Failed to send email confirmation letter', __METHOD__);
-        }
-    }
-
-    private function isCaptchaChecked(bool $isCaptchaRequired = false) : bool
-    {
-        if ($isCaptchaRequired !== true) {
-            return true;
-        }
-
-        try {
-            $isChecked = InvisibleRecaptchaValidator::validateInline(Yii::$app->request->post(), Yii::$app->request->userIP);
-        } catch (\yii\base\InvalidConfigException $e) {
-            return false;
-        }
-
-        return $isChecked;
+        return $response;
     }
 }

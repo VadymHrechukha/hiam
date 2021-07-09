@@ -20,6 +20,9 @@ return [
     ]),
     'as saveReturnUrl' => \hiam\behaviors\SaveReturnUrl::class,
     'components' => [
+        'request' => [
+            'class'     => \hiam\components\Request::class,
+        ],
         'db' => [
             'class'     => \yii\db\Connection::class,
             'charset'   => 'utf8',
@@ -42,7 +45,8 @@ return [
             'enableAutoLogin' => $params['user.enableAutoLogin'],
             'disableSignup'   => $params['user.disableSignup'],
             'disableRestorePassword' => $params['user.disableRestorePassword'],
-            'as checkEmailConfirmed' => $params['user.checkEmailConfirmed'] ? \hiam\behaviors\CheckEmailConfirmed::class : null,
+            'as checkEmailConfirmed' => \hiam\behaviors\CheckEmailConfirmed::class,
+            'as notifyAdminAfterSignup' => \hiam\behaviors\NotifyAdminAfterSignup::class,
         ]),
         'authClientCollection' => [
             'class' => \hiam\authclient\Collection::class,
@@ -114,6 +118,10 @@ return [
                     $params['user.authKeySecret'],
                     $params['user.authKeyCipher'],
                 ],
+            ],
+            \hiqdev\yii2\confirmator\Service::class => [
+                'mailTokenLifetime' => $params['confirmator.mail.token.lifetime'] ?? '1 hour',
+                'as setFlashAfterMailToken' => \hiam\behaviors\SetFlashAfterMailToken::class,
             ],
         ],
         'singletons' =>     [

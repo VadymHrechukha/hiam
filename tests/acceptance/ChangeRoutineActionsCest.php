@@ -35,9 +35,6 @@ final class ChangeRoutineActionsCest extends BasicHiamActions
         $I->waitForText('Password has been successfully changed');
         $transition->baseCheck();
 
-        $lockscreen = new Lockscreen($I);
-        $lockscreen->tryLogout();
-
         $info['password'] = $info['new_password'];
         $this->doLogin($I, $info);
     }
