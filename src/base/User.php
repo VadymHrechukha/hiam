@@ -18,9 +18,12 @@ use yii\authclient\ClientInterface;
 use yii\base\InvalidConfigException;
 use yii\web\IdentityInterface;
 use yii\web\Session;
+use yii\web\UserEvent;
 
 class User extends \yii\web\User
 {
+    const EVENT_AFTER_SIGNUP = 'afterSignup';
+
     public $storageClasses = [];
 
     public $remoteUserClass;
@@ -31,7 +34,7 @@ class User extends \yii\web\User
 
     public $loginDuration = 3600 * 24 * 31;
 
-    private $session;
+    private Session $session;
 
     public function __construct(Session $session, $config = [])
     {
@@ -60,32 +63,17 @@ class User extends \yii\web\User
      */
     public function signup($model)
     {
-        if (!$model->validate()) {
+        /** @var Identity $identity */
+        $identity = Yii::createObject($this->identityClass);
+        $identity->setAttributes($model->getAttributes());
+        $identity->username = $model->username ?? $model->email;
+
+        if (!$identity->save()) {
             return null;
         }
-        $class = $this->identityClass;
-        $user = Yii::createObject($class);
-        $user->setAttributes($model->getAttributes());
-        $user->username = $model->username ?? $model->email;
 
-        if ($user->save()) {
-            $this->notifySignup($user);
-            $this->login($user);
-
-            return $user;
-        }
-
-        return null;
-    }
-
-    protected function notifySignup($user)
-    {
-        $params = Yii::$app->params;
-
-        return Yii::$app->mailer->compose()
-            ->renderHtmlBody('userSignup', compact('user'))
-            ->setTo($params['signupEmail'] ?? $params['supportEmail'] ?? $params['adminEmail'])
-            ->send();
+        $this->trigger(static::EVENT_AFTER_SIGNUP, new UserEvent(['identity' => $identity]));
+        return $identity;
     }
 
     /**
@@ -207,7 +195,6 @@ class User extends \yii\web\User
             return false;
         }
         $class = $this->getStorageClass('identity');
-        /** @var \hiam\mrdp\storage\Client $user */
         $user = $class::find()->whereId(Yii::$app->user->id)->one();
 
         return $user->updateEmail($model->email);

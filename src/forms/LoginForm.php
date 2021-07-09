@@ -11,6 +11,7 @@
 namespace hiam\forms;
 
 use hiam\validators\LoginValidatorInterface;
+use hiam\validators\PasswordValidatorInterface;
 use Yii;
 use yii\base\Model;
 
@@ -26,27 +27,14 @@ class LoginForm extends Model
     public $remember_me = true;
 
     /**
-     * @var LoginValidatorInterface
-     */
-    private $loginValidator;
-
-    /**
-     * @param array $config
-     */
-    public function __construct(LoginValidatorInterface $loginValidator, $config = [])
-    {
-        parent::__construct($config);
-        $this->loginValidator = $loginValidator;
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function rules()
     {
         return [
             ['username', 'filter', 'filter' => 'strtolower'],
-            ['username', $this->loginValidator->inlineFor($this)],
+            ['username', LoginValidatorInterface::class],
+            ['password', PasswordValidatorInterface::class],
             [['username', 'password'], 'trim'],
             [['username', 'password'], 'required'],
             ['remember_me', 'boolean'],

@@ -36,6 +36,8 @@ class Identity extends ProxyModel implements
     ApiMfaIdentityInterface,
     UserCredentialsInterface
 {
+    use MaskedEmailTrait;
+
     public $id;
     public $type;
     public $state;

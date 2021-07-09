@@ -11,7 +11,7 @@
 namespace hiam\forms;
 
 use hiam\models\Identity;
-use hiam\validators\PasswordValidatorInterface;
+use hiam\validators\ChangePasswordValidatorInterface;
 use Yii;
 use yii\base\Model;
 
@@ -32,19 +32,16 @@ class ChangePasswordForm extends Model
      */
     public $confirm_password;
 
-    private PasswordValidatorInterface $passwordValidator;
     private Identity $identity;
 
     /**
      * @param Identity $identity user's identity, who's password is being changed
-     * @param PasswordValidatorInterface $passwordValidator
      * @param array $config
      */
-    public function __construct(Identity $identity, PasswordValidatorInterface $passwordValidator, $config = [])
+    public function __construct(Identity $identity, $config = [])
     {
         parent::__construct($config);
         $this->identity = $identity;
-        $this->passwordValidator = $passwordValidator;
     }
 
     public function getLogin(): string
@@ -60,7 +57,7 @@ class ChangePasswordForm extends Model
         return [
             [['current_password', 'new_password', 'confirm_password'], 'string'],
             [['current_password', 'new_password', 'confirm_password'], 'required'],
-            ['current_password', $this->passwordValidator->inlineFor($this)],
+            ['current_password', ChangePasswordValidatorInterface::class],
             ['confirm_password', 'compare', 'compareAttribute' => 'new_password'],
         ];
     }
