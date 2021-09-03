@@ -12,7 +12,7 @@ namespace hiam\behaviors;
 
 use hiam\components\OauthInterface;
 use hiam\providers\ReturnUrlsProviderInterface;
-use hiam\validators\BackUrlValidatorInterface;
+use hiqdev\yii2\mfa\validator\BackUrlValidatorInterface;
 use Yii;
 use yii\base\Application;
 use yii\base\Event;

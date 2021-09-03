@@ -125,7 +125,7 @@ return [
             ],
         ],
         'singletons' =>     [
-            \hiqdev\yii2\mfa\validator\BackUrlValidatorInterface::class => \hiam\validators\BackUrlValidatorInterface::class,
+            \hiqdev\yii2\mfa\validator\BackUrlValidatorInterface::class => \hiqdev\yii2\mfa\validator\BackUrlValidator::class,
             \hiqdev\php\confirmator\ServiceInterface::class => [
                 'class' => \hiqdev\yii2\confirmator\Service::class,
             ],
