@@ -15,6 +15,7 @@ return [
     'name' => 'HIAM',
     'layout' => 'mini',
     'controllerNamespace' => 'hiam\controllers',
+    'viewPath' => '@vendor/hiqdev/hiam/src/views',
     'bootstrap' => array_filter([
         'language' => 'language',
     ]),
