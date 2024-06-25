@@ -41,12 +41,14 @@ class SignupForm extends Model
 
     public $send_me_news;
 
+    public $glory_to_ukraine;
+
     /**
      * {@inheritdoc}
      */
     public function rules()
     {
-        return [
+        return array_filter([
             [['first_name', 'last_name', 'email', 'password'], 'trim'],
             [['first_name', 'last_name', 'password'], 'string', 'min' => 2, 'max' => 64],
 
@@ -71,7 +73,11 @@ class SignupForm extends Model
             ['i_agree_terms_and_privacy', 'required', 'requiredValue' => 1, 'message' => '',
                 'on' => [self::SCENARIO_SOCIAL, self::SCENARIO_SHORT],
             ],
-        ];
+            Yii::$app->params['hiam.glory_to_ukraine'] === true ? [['glory_to_ukraine'], 'boolean'] : null,
+            Yii::$app->params['hiam.glory_to_ukraine'] === true
+                ? ['glory_to_ukraine', 'required', 'requiredValue' => 1, 'on' => [self::SCENARIO_DEFAULT, self::SCENARIO_SHORT]]
+                : null,
+        ]);
     }
 
     public function attributeLabels()
@@ -89,6 +95,7 @@ class SignupForm extends Model
                 'terms_of_services' => Html::a(Yii::t('hiam', 'Terms of Services'), '/site/terms'),
                 'privacy_policy' => Html::a(Yii::t('hiam', 'Privacy Policy'), '/site/privacy-policy'),
             ]),
+            'glory_to_ukraine' => Yii::t('hiam', 'I condemn the military aggression of the russian federation against Ukraine. I undertake not to use this Service and not to implement projects in order to support or justify the actions of the terrorist regime of the russian federation, the republic of belarus. I understand that in case of a breach of this warranty, the provision of services by this Service will be terminated immediately.'),
         ];
     }
 }

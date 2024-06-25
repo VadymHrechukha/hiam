@@ -253,7 +253,12 @@ class SiteController extends \hisite\controllers\SiteController
 
     public function actionSignup($scenario = SignupForm::SCENARIO_DEFAULT)
     {
+
         if ($this->user->disableSignup) {
+            if (!empty(Yii::$app->params['user.signup.redirect'])) {
+                return $this->redirect(Yii::$app->params['user.signup.redirect']);
+            }
+
             Yii::$app->session->setFlash('error', Yii::t('hiam', 'Sorry, signup is disabled.'));
 
             return $this->redirect(['login']);
