@@ -78,5 +78,6 @@ return [
     'Last name' => 'Фамилия',
     'Last name: {last_name}' => 'Фамилия: {last_name}',
     'IP: {ip}' =>  'IP: {ip}',
+    'I condemn the military aggression of the russian federation against Ukraine. I undertake not to use this Service and not to implement projects in order to support or justify the actions of the terrorist regime of the russian federation, the republic of belarus. I understand that in case of a breach of this warranty, the provision of services by this Service will be terminated immediately.' => 'Я осуждаю военную агрессию росийской фередации в отношении Украины. Я обязуюсь не использовать этот Сервис и не реализовывать проекты с целью поддержки или оправдания действий террористического режима российской федерации, республики белорусь. Я понимаю, что в случае нарушения этой гарантии предоставление услуг этим Сервисом будет прекращено немедленно.',
     'Attention! The link is valid until {date} UTC' => 'Внимание! Ссылка действительна до {date} UTC',
 ];

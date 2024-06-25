@@ -73,4 +73,6 @@ return [
     'yandex_client_secret'      => null,
     'live_client_id'            => null,
     'live_client_secret'        => null,
+
+    'hiam.glory_to_ukraine' => false,
 ];
