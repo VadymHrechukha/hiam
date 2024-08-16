@@ -76,7 +76,7 @@ class OauthController extends \yii\web\Controller
     }
 
     /**
-     * @return IdentityInterface|User
+     * @return IdentityInterface|User|null
      */
     public function findIdentityByToken(OauthAccessTokens $token)
     {
@@ -95,10 +95,14 @@ class OauthController extends \yii\web\Controller
         $access_token = $response->getParameter($this->getTokenParamName());
         if ($access_token) {
             $token = $this->findToken($access_token);
-            $attributes = $this->findIdentityByToken($token)->getAttributes();
-            $response->addParameters([
-                'user_attributes' => $this->cleanAttributes($attributes),
-            ]);
+            $identity = $this->findIdentityByToken($token);
+
+            if ($identity) {
+                $attributes = $identity->getAttributes();
+                $response->addParameters([
+                    'user_attributes' => $this->cleanAttributes($attributes),
+                ]);
+            }
         }
 
         return $this->oauth->sendResponse();
